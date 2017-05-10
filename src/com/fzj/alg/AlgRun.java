@@ -58,15 +58,20 @@ public class AlgRun {
 		List<ASolution> t_aTC_results = new ArrayList<>();
 		List<Fitness> t_aTC_minBest = new ArrayList<>();
 		for(int t_aI4_i=0;t_aI4_i<f_aI4_run_times;t_aI4_i++){
-			if (m_str_alg_type.equals(NameSpace.s_str_dnspso)) {
-				t_aTC_strategy = new DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
-			}else if(m_str_alg_type.equals(NameSpace.s_str_fade)){
-				t_aTC_strategy = new FireSparkStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
-			}else if(m_str_alg_type.equals(NameSpace.s_str_wwo)){
-				t_aTC_strategy = new WWOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
-			}else if(m_str_alg_type.equals(NameSpace.s_str_dednspso)){
-				t_aTC_strategy = new DE_DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+			if (m_str_alg_type.equals(NameSpace.s_str_bpso)) {
+				t_aTC_strategy = new BPSO(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+			}else if(m_str_alg_type.equals(NameSpace.s_str_dnspso)){
+				t_aTC_strategy = new DNSBPSO(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+			}else if(m_str_alg_type.equals(NameSpace.s_str_bde)){
+				t_aTC_strategy = new BDE(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+			}else if(m_str_alg_type.equals(NameSpace.s_str_ga)){
+				t_aTC_strategy = new GA(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+			}else if(m_str_alg_type.equals(NameSpace.s_str_ibpso)){
+				t_aTC_strategy = new IBPSO(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+			}else if(m_str_alg_type.equals(NameSpace.s_str_ampso)){
+				t_aTC_strategy = new AMPSO(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
 			}
+			
 			t_aTC_best_solution = t_aTC_strategy.solve(t_aI4_i+1);
 			double t_aI4_best_fitness = t_aTC_best_solution.getM_aI8_fitness();
 			t_aI8_sum += t_aI4_best_fitness;

@@ -102,7 +102,7 @@ public class FileUtils {
 			t_aTC_map.put(NameSpace.s_str_m, Integer.parseInt(t_rstr_s[0]));
 			t_aTC_map.put(NameSpace.s_str_n, Integer.parseInt(t_rstr_s[1]));
 			t_aTC_map.put(NameSpace.s_str_k, Integer.parseInt(t_rstr_s[2]));
-			
+			t_aTC_map.put(NameSpace.s_str_q, Integer.parseInt(t_rstr_s[3]));
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

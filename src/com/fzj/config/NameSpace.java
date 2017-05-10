@@ -19,9 +19,10 @@ public class NameSpace {
 
 	/**
 	 * 基本信息文件名 
-	 * 存放N （危害物品种类数）
-	 * 存放M （安检设备种类数）
-	 * 存放R （安检场所数）
+	 * 存放M （危害物品种类数）
+	 * 存放N （行李数）
+	 * 存放K （安检设备种类数）
+	 * 存放Q （安检人员数）
 	 */
 	public static final String s_str_basic_info = "basic_info.txt";
 	
@@ -31,9 +32,9 @@ public class NameSpace {
 	public static final String s_str_wi = "w_i.txt";
 	
 	/**
-	 * 设备k是自动设备还是手动设备
+	 * 时间上限系数
 	 */
-	public static final String s_str_yk = "y_k.txt";
+	public static final String s_str_landa = "landa.txt";
 	
 	/**
 	 * 包裹j的长度
@@ -46,19 +47,14 @@ public class NameSpace {
 	public static final String s_str_sj = "s_j.txt";
 	
 	/**
-	 * 自动检测速度
+	 * 检测速度
 	 */
-	public static final String s_str_vak = "va_k.txt";
+	public static final String s_str_vk = "v_k.txt";
 	
 	/**
-	 * 手动检测速度
+	 * 每个行李最多可分配的设备数
 	 */
-	public static final String s_str_vhk = "vh_k.txt";
-	
-	/**
-	 * 设备k的容积
-	 */
-	public static final String s_str_ck = "c_k.txt";
+	public static final String s_str_b = "b.txt";
 	
 	/**
 	 * 携带i的概率
@@ -68,7 +64,12 @@ public class NameSpace {
 	/**
 	 * i被k检测的概率
 	 */
-	public static final String s_str_yik = "y_ik.txt";
+	public static final String s_str_ydik = "yd_ik.txt";
+	
+	/**
+	 * i被k检测的概率
+	 */
+	public static final String s_str_ypi = "yp_i.txt";
 	
 	/**
 	 * 第一组实验数据
@@ -101,26 +102,38 @@ public class NameSpace {
 	public static final String s_str_m = "HAZARDOUS_SUBSTANCE";
 	
 	/**
-	 * 安检设备种类数
+	 * 行李数
 	 */
 	public static final String s_str_n = "BAGGAGE";
 	
 	/**
-	 * 安检场所数
+	 * 安检设备数
 	 */
 	public static final String s_str_k = "SECURITY_SCREENING_DEVICE";
 	
-	public static final String s_str_p = "PTHDEVICE";
-	
 	/**
-	 * PSO算法
+	 * 安检人员数
 	 */
-	public static final String s_str_pso = "PSO";
+	public static final String s_str_q = "SECURITY_SCREENING_DEVICE_PERSONNEL";
+	
+	
 	
 	/**
 	 * DNSPSO算法
 	 */
 	public static final String s_str_dnspso = "DNSPSO";
+	
+	public static final String s_str_bpso = "BPSO";
+	
+	public static final String s_str_ga = "GA";
+	
+	public static final String s_str_ibpso = "IBPSO";
+	
+	public static final String s_str_bde = "BDE";
+	
+	public static final String s_str_bwwo = "BWWO";
+	
+	public static final String s_str_ampso = "AMPSO";
 	
 	/**
 	 * FADE算法
@@ -132,10 +145,6 @@ public class NameSpace {
 	 */
 	public static final String s_str_wwo = "WWO";
 	
-	/**
-	 * PWWO算法
-	 */
-	public static final String s_str_pwwo = "PWWO";
 	
 	/**
 	 * 改进的DNSPSO
@@ -186,6 +195,20 @@ public class NameSpace {
 	 * WWO的最大迭代次数
 	 */
 	public static final String s_str_max_iter_wwo = "max_iter_wwo";
+	
+	/**
+	 * BPSO的最大迭代次数
+	 */
+	public static final String s_str_max_iter_bpso = "max_iter_bpso";
+	
+	public static final String s_str_max_iter_ga = "max_iter_ga";
+	
+	public static final String s_str_max_iter_ibpso = "max_iter_ibpso";
+	
+	public static final String s_str_max_iter_ampso = "max_iter_ampso";
+	
+	public static final String s_str_max_iter_bde = "max_iter_bde";
+	
 	
 	/**
 	 * 正式运行配置

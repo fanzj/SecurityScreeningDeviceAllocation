@@ -1,16 +1,15 @@
 package com.fzj.alg;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import com.fzj.config.NameSpace;
 import com.fzj.model.SSModel;
 import com.fzj.solution.ASolution;
-import com.fzj.solution.FireSparkSolution;
 import com.fzj.solution.Fitness;
-import com.fzj.solution.ParticleSolution;
-import com.fzj.solution.WaveSolution;
+import com.fzj.utils.MathUtils;
 
 /**
  * @author Fan Zhengjie
@@ -32,26 +31,28 @@ public abstract class AStrategy {
 	protected int m_aI4_cur_iter;// 当前进化代数
 	protected int m_aI4_cur_nfe;// 当前评价次数
 
+	//输入变量
 	protected SSModel m_aTC_ssm;// 安检设备调度模型
 	protected int m_aI4_m;// 危险物品种类数
 	protected int m_aI4_n;// 包裹数
 	protected int m_aI4_k;// 安检设备种类
-	protected int m_aI4_p;// 每个包裹所分配的最大设备数
+	protected int m_aI4_q;// 安检人员数
 	protected double m_rI8_wi[];// 危险物品的权重
-	protected int m_rI4_yk[];// 设备k是自动设备还是手动设备
 	protected double m_rI8_lj[];// 包裹j的最大长度
 	protected double m_rI8_sj[];// 包裹j的体积
-	protected double m_rI8_vak[];// 自动设备k的检测速度
-	protected double m_rI8_vhk[];// 手动设备k的检测速度
-	protected double m_aI8_ta;// 自动设备检测的时间上限
-	protected double m_aI8_th;// 手动检测设备的时间上限
-	protected double m_rI8_ck[];// 设备k的容积
+	protected double m_rI8_vk[];// 自动设备k的检测速度
 	protected double m_aI8_a;// 每个包裹携带危险品的概率
 	protected double m_rI8_bi[];// 携带危险品为i的概率
-	protected double m_rI8_yik[][];// 危险品i被k检测到的概率
+	protected double m_rI8_ydik[][];// 危险品i被k检测到的概率
+	protected double m_rI8_ypi[];// i被安检人员检测的概率
+	protected int m_aI4_b;//每个行李最多可分配的设备数
 
-	protected double m_rI8_tjk[][];// 检测时间，包裹j被设备k检测所需时间
-
+	//中间变量
+	protected double m_rI8_tdjk[][];// 检测时间，包裹j被设备k检测所需时间
+	protected double m_rI8_tpj[];//检测时间，包裹j被安检人员检测时间
+	protected double m_aI8_u;//总的时间上限
+	protected int m_aI4_z;//所有行李分配的安检人员数
+	
 	protected Random m_aTC_random;// 随机数生成器
 
 	protected int m_aI4_low;// 约束下限
@@ -77,19 +78,17 @@ public abstract class AStrategy {
 		this.m_aI4_m = m_aTC_ssm.getM_aI4_m();
 		this.m_aI4_n = m_aTC_ssm.getM_aI4_n();
 		this.m_aI4_k = m_aTC_ssm.getM_aI4_k();
-		this.m_aI4_p = m_aTC_ssm.getM_aI4_p();
+		this.m_aI4_q = m_aTC_ssm.getM_aI4_q();
 		this.m_rI8_wi = m_aTC_ssm.getM_rI8_wi();
-		this.m_rI4_yk = m_aTC_ssm.getM_rI4_yk();
 		this.m_rI8_lj = m_aTC_ssm.getM_rI8_lj();
 		this.m_rI8_sj = m_aTC_ssm.getM_rI8_sj();
-		this.m_rI8_vak = m_aTC_ssm.getM_rI8_vak();
-		this.m_rI8_vhk = m_aTC_ssm.getM_rI8_vhk();
-		this.m_aI8_ta = m_aTC_ssm.getM_aI8_ta();
-		this.m_aI8_th = m_aTC_ssm.getM_aI8_th();
-		this.m_rI8_ck = m_aTC_ssm.getM_rI8_ck();
+		this.m_rI8_vk = m_aTC_ssm.getM_rI8_vk();
 		this.m_aI8_a = m_aTC_ssm.getM_aI8_a();
 		this.m_rI8_bi = m_aTC_ssm.getM_rI8_bi();
-		this.m_rI8_yik = m_aTC_ssm.getM_rI8_yik();
+		this.m_rI8_ydik = m_aTC_ssm.getM_rI8_ydik();
+		this.m_rI8_ypi = m_aTC_ssm.getM_rI8_ypi();
+		this.m_aI4_b = m_aTC_ssm.getM_aI4_b();
+		this.m_aI8_u = m_aTC_ssm.getM_aI8_u();
 
 		this.m_aTC_random = new Random(System.currentTimeMillis());
 		this.m_aTC_listOfFitness = new ArrayList<>();
@@ -101,178 +100,137 @@ public abstract class AStrategy {
 	}
 
 	/**
-	 * 【是否为合法解】 满足约束 1.每个解的 自动检测时间小于上限，手动检测时间小于上限 2.每个解 分配到各个设备的容量都在范围之内
-	 * 3.每个包裹至少分配给一个设备
+	 * 【是否为合法解】 
+	 * 满足约束 1.MAX(Td，Tp)<=U
+	 * 2.每个包裹最多分配给B个安检设备
+	 * 3.每个包裹至少分配给一个安检设备和人员
 	 * 
 	 * @param f_aTC_s
 	 * @return
 	 */
 	protected boolean isValidSolution(ASolution f_aTC_s) {
-		// 时间约束1不满足
-		if (Double.compare(f_aTC_s.getM_aI8_ta(), m_aI8_ta) > 0 || Double.compare(f_aTC_s.getM_aI8_th(), m_aI8_th) > 0)
+		double t_aI8_time = Math.max(f_aTC_s.getM_aI8_td(), f_aTC_s.getM_aI8_tp());
+		if(Double.compare(t_aI8_time, m_aI8_u)>0)
 			return false;
-		// 验证约束2
-		double t_rI8_vol[] = f_aTC_s.getM_rI8_vol();
-		for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-			if (Double.compare(t_rI8_vol[t_aI4_k], m_rI8_ck[t_aI4_k]) > 0)
-				return false;
-		}
-		// 验证约束3
-		int t_rI4_bag[] = f_aTC_s.getM_rI4_bag();
-		for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
-			if (t_rI4_bag[t_aI4_j] <= 0)
+		int[] t_rI4_bag = f_aTC_s.getM_rI4_bag();
+		int[] t_rI4_fac = f_aTC_s.getM_rI4_fac();
+		for(int t_aI4_j=0;t_aI4_j<m_aI4_n;t_aI4_j++){
+			if(t_rI4_bag[t_aI4_j]>m_aI4_b || t_rI4_fac[t_aI4_j]<1)
 				return false;
 		}
 		return true;
 	}
+	
+	private void recal(ASolution f_aTC_s){
+		int[] t_rI4_x = f_aTC_s.getM_rI4_x();
+		int[] t_rI4_bag = new int[m_aI4_n];
+		int[] t_rI4_fac = new int[m_aI4_n];
+		
+		for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
+			int t_aI4_device = 0;
+			int t_aI4_all = 0;
+			for(int t_aI4_k=0;t_aI4_k<m_aI4_k+1;t_aI4_k++){
+				int t_aI4_pos = t_aI4_j*(m_aI4_k+1) + t_aI4_k;
+				if(t_aI4_k<m_aI4_k){
+					t_aI4_device += t_rI4_x[t_aI4_pos];
+					t_aI4_all += t_rI4_x[t_aI4_pos];
+					continue;
+				}
+				t_aI4_all += t_rI4_x[t_aI4_pos];
+			}
+			t_rI4_bag[t_aI4_j] = t_aI4_device;
+			t_rI4_fac[t_aI4_j] = t_aI4_all;
+		}
+		f_aTC_s.setM_rI4_bag(t_rI4_bag);
+		f_aTC_s.setM_rI4_fac(t_rI4_fac);
+		
+		calTdTp(f_aTC_s);
+	}
 
+	
 	/**
 	 * 【解的修正】 对于不合法的解做相应的修正操作使其合法
 	 * 
 	 * @param f_aTC_s
 	 */
 	protected void modify(ASolution f_aTC_s) {
-		reCal(f_aTC_s);
-		int t_aI4_c = 0;// 循环次数
-		while (!isValidSolution(f_aTC_s)) {
-			t_aI4_c++;
-			int[] t_rI4_x = f_aTC_s.getM_rI4_x();
-			double t_aI8_ta = f_aTC_s.getM_aI8_ta();// 自动检测时间
-			double t_aI8_th = f_aTC_s.getM_aI8_th();// 手动检测时间
-			int[] t_rI4_bag = f_aTC_s.getM_rI4_bag();// 分配到每个包裹的设备数
-			double[] t_rI8_vol = f_aTC_s.getM_rI8_vol();// 分配给各个设备的当前容量
-
-			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {// 检测各类设备
-				int t_aI4_con2 = 0;
-				while (Double.compare(t_rI8_vol[t_aI4_k], m_rI8_ck[t_aI4_k]) > 0) {// 检测违反约束2
-					t_aI4_con2++;
-					//System.out.println("t_aI4_con2 = "+t_aI4_con2);
-					if(t_aI4_con2>20)//防止陷入死循环
-						break;
-					int t_aI4_j = m_aTC_random.nextInt(m_aI4_n);
-					int t_aI4_pos = t_aI4_j * m_aI4_k + t_aI4_k;
-					//【bug 如果不作处理，易陷入死循环】
-					if (t_rI4_x[t_aI4_pos] == 1 && t_rI4_bag[t_aI4_j] >1) {// 约束3
-						t_rI4_x[t_aI4_pos] = 0;
-						t_rI8_vol[t_aI4_k] -= (m_rI8_sj[t_aI4_j] * m_rI4_yk[t_aI4_k]);
-						t_rI4_bag[t_aI4_j]--;
-						t_aI8_ta -= m_rI8_tjk[t_aI4_j][t_aI4_k] * m_rI4_yk[t_aI4_k];
-						t_aI8_th -= m_rI8_tjk[t_aI4_j][t_aI4_k] * (1 - m_rI4_yk[t_aI4_k]);
-					}
-					
-				}
-			}
-			//如果此时解已合法，则结束
-			if(isValidSolution(f_aTC_s)){
-				//System.out.println("valid solution - 1");
-				return;
-			}
-				
-			
-			for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {// 每个包裹
-				//int t_aI4_test_2 = 0;
-				while (t_rI4_bag[t_aI4_j] < 1) {// 违反约束3
-					int t_aI4_k = m_aTC_random.nextInt(m_aI4_k);
-					int t_aI4_pos = t_aI4_j * m_aI4_k + t_aI4_k;
-				//	System.out.println("t_aI4_test_2 = "+(t_aI4_test_2++));
-					if (t_rI4_x[t_aI4_pos] == 0 && Double.compare(t_rI8_vol[t_aI4_k], m_rI8_ck[t_aI4_k]) <= 0) {// 约束2	
-						t_rI4_x[t_aI4_pos] = 1;
-						t_rI8_vol[t_aI4_k] += (m_rI8_sj[t_aI4_j] * m_rI4_yk[t_aI4_k]);
-						t_rI4_bag[t_aI4_j]++;
-						t_aI8_ta += m_rI8_tjk[t_aI4_j][t_aI4_k] * m_rI4_yk[t_aI4_k];
-						t_aI8_th += m_rI8_tjk[t_aI4_j][t_aI4_k] * (1 - m_rI4_yk[t_aI4_k]);
-					}
-					
-				}
-			}
-
-			//如果此时解已合法，则结束
-			if(isValidSolution(f_aTC_s)){
-				//System.out.println("valid solution - 2");
-				return;
-			}
-			
-			int t_aI4_con_t = 0;
-			while(Double.compare(f_aTC_s.getM_aI8_ta(), m_aI8_ta)>0 || Double.compare(f_aTC_s.getM_aI8_th(), m_aI8_th)>0){
-				t_aI4_con_t++;
-				//System.out.println("t_aI4_con2 = "+t_aI4_con2);
-				if(t_aI4_con_t>20)//防止陷入死循环
-					break;
-				int t_aI4_j = m_aTC_random.nextInt(m_aI4_n);
-				int t_aI4_k = m_aTC_random.nextInt(m_aI4_k);
-				int t_aI4_pos = t_aI4_j * m_aI4_k + t_aI4_k;
-				//【bug 如果不作处理，易陷入死循环】
-				if (t_rI4_x[t_aI4_pos] == 1 && t_rI4_bag[t_aI4_j] >1) {// 约束3
-					t_rI4_x[t_aI4_pos] = 0;
-					t_rI8_vol[t_aI4_k] -= (m_rI8_sj[t_aI4_j] * m_rI4_yk[t_aI4_k]);
-					t_rI4_bag[t_aI4_j]--;
-					t_aI8_ta -= m_rI8_tjk[t_aI4_j][t_aI4_k] * m_rI4_yk[t_aI4_k];
-					t_aI8_th -= m_rI8_tjk[t_aI4_j][t_aI4_k] * (1 - m_rI4_yk[t_aI4_k]);
-				}
-					
-			}
+		recal(f_aTC_s);
+		if(isValidSolution(f_aTC_s))
+			return;
 		
-			//如果此时解已合法，则结束
-			if(isValidSolution(f_aTC_s)){
-				//System.out.println("valid solution - 3");
-				return;
+	
+		while(!isValidSolution(f_aTC_s)){
+			
+			int[] t_rI4_x = f_aTC_s.getM_rI4_x();
+			int[] t_rI4_bag = f_aTC_s.getM_rI4_bag();
+			int[] t_rI4_fac = f_aTC_s.getM_rI4_fac();
+			
+			//检验另外两个，使之满足
+			for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; ) {
+				int t_aI4_device = 0;
+				int t_aI4_all = 0;
+				for(int t_aI4_k=0;t_aI4_k<m_aI4_k+1;t_aI4_k++){
+					int t_aI4_pos = t_aI4_j*(m_aI4_k+1) + t_aI4_k;
+					if(t_aI4_k<m_aI4_k){
+						t_aI4_device += t_rI4_x[t_aI4_pos];
+						t_aI4_all += t_rI4_x[t_aI4_pos];
+						continue;
+					}
+					t_aI4_all += t_rI4_x[t_aI4_pos];
+				}
+				
+				if(t_aI4_device>m_aI4_b){//违反约束
+					int t_aI4_p = MathUtils.getIntAtoB(t_aI4_j*(m_aI4_k+1), (t_aI4_j+1)*(m_aI4_k+1)-2);
+					while(t_rI4_x[t_aI4_p]==0){
+						t_aI4_p = MathUtils.getIntAtoB(t_aI4_j*(m_aI4_k+1), (t_aI4_j+1)*(m_aI4_k+1)-2);
+					}
+					t_rI4_x[t_aI4_p]=0;
+				}else if (t_aI4_all<1) {
+					int t_aI4_p = MathUtils.getIntAtoB(t_aI4_j*(m_aI4_k+1), (t_aI4_j+1)*(m_aI4_k+1)-1);
+					while(t_rI4_x[t_aI4_p]==1){
+						t_aI4_p = MathUtils.getIntAtoB(t_aI4_j*(m_aI4_k+1), (t_aI4_j+1)*(m_aI4_k+1)-1);
+					}
+					t_rI4_x[t_aI4_p]=1;
+				}
+				else {
+					t_rI4_bag[t_aI4_j] = t_aI4_device;
+					t_rI4_fac[t_aI4_j] = t_aI4_all;
+					t_aI4_j++;
+				}
 			}
 			
-			if (t_aI4_c > 100) {// 20次还没修正，就重新创建一个新解
-				t_aI4_c = 0;
-				//System.out.println("new solution");
-				createNewSolution(f_aTC_s);
+			//另外两个满足，检验时间是否越界
+			recal(f_aTC_s);
+			double t_aI8_time = Math.max(f_aTC_s.getM_aI8_td(), f_aTC_s.getM_aI8_tp());
+			while(Double.compare(t_aI8_time, m_aI8_u)>0){
+				//System.out.println("时间越界");
+				int t_aI4_p = m_aTC_random.nextInt(m_aI4_d);
+				while(t_rI4_x[t_aI4_p]==0){
+					t_aI4_p = m_aTC_random.nextInt(m_aI4_d);
+				}
+				t_rI4_x[t_aI4_p]=0;
+				calTdTp(f_aTC_s);
+				t_aI8_time = Math.max(f_aTC_s.getM_aI8_td(), f_aTC_s.getM_aI8_tp());
 			}
-			//System.out.println("t_aI4_c = "+t_aI4_c);
+			recal(f_aTC_s);
 		}
+		
 	}
 
-	/**
-	 * 重新计算
-	 * 
-	 * @param f_aTC_s
-	 * @param f_aI4_k
-	 *            设备编号
-	 */
-	private void reCal(ASolution f_aTC_s) {
-		int[] t_rI4_x = f_aTC_s.getM_rI4_x();
-		double t_aI8_ta = 0;// 自动检测时间
-		double t_aI8_th = 0;// 手动检测时间
-		int[] t_rI4_bag = new int[m_aI4_n];// 各个包裹分配到的设备数
-		double[] t_rI8_vol = new double[m_aI4_k];// 分配给各个设备的当前容量
-
-		for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
-			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-				int t_aI4_pos = t_aI4_j * m_aI4_k + t_aI4_k;
-				// 自动检测时间
-				t_aI8_ta += m_rI8_tjk[t_aI4_j][t_aI4_k] * t_rI4_x[t_aI4_pos] * m_rI4_yk[t_aI4_k];
-				// 手动检测时间
-				t_aI8_th += m_rI8_tjk[t_aI4_j][t_aI4_k] * t_rI4_x[t_aI4_pos] * (1 - m_rI4_yk[t_aI4_k]);
-				// 各个包裹分配到的设备数
-				t_rI4_bag[t_aI4_j] += t_rI4_x[t_aI4_pos];
-				// 各个设备的当前容纳量
-				t_rI8_vol[t_aI4_k] += (m_rI8_sj[t_aI4_j] * t_rI4_x[t_aI4_pos] * m_rI4_yk[t_aI4_k]);
-			}
-		}
-		f_aTC_s.setM_aI8_ta(t_aI8_ta);
-		f_aTC_s.setM_aI8_th(t_aI8_th);
-		f_aTC_s.setM_rI4_bag(t_rI4_bag);
-		f_aTC_s.setM_rI8_vol(t_rI8_vol);
-	}
 
 	/**
 	 * 计算检测时间
 	 */
 	private void calDetectTime() {
-		m_rI8_tjk = new double[m_aI4_n][m_aI4_k];
-		for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
-			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-				if (m_rI4_yk[t_aI4_k] == 1) {// 自动设备
-					m_rI8_tjk[t_aI4_j][t_aI4_k] = m_rI8_lj[t_aI4_j] / m_rI8_vak[t_aI4_k];
-				} else {// 手动设备
-					m_rI8_tjk[t_aI4_j][t_aI4_k] = m_rI8_sj[t_aI4_j] / m_rI8_vhk[t_aI4_k];
+		m_rI8_tdjk = new double[m_aI4_n][m_aI4_k];
+		m_rI8_tpj = new double[m_aI4_n];
+		for(int t_aI4_j=0;t_aI4_j<m_aI4_n;t_aI4_j++){
+			for(int t_aI4_k=0;t_aI4_k<m_aI4_k+1;t_aI4_k++){
+				if(t_aI4_k<m_aI4_k){
+					m_rI8_tdjk[t_aI4_j][t_aI4_k] = m_rI8_lj[t_aI4_j]/m_rI8_vk[t_aI4_k];
 				}
 			}
+			m_rI8_tpj[t_aI4_j] = 10*Math.sqrt(m_rI8_sj[t_aI4_j]);
 		}
 	}
 
@@ -285,27 +243,48 @@ public abstract class AStrategy {
 	 * 种群初始化
 	 */
 	protected void initPopulation(String f_str_alg_name) {
-		for (int t_aI4_k = 0; t_aI4_k < m_aI4_size; t_aI4_k++) {
+		for (int t_aI4_i = 0; t_aI4_i < m_aI4_size; t_aI4_i++) {
 			ASolution t_aTC_solution = null;
-			if (f_str_alg_name.equals(NameSpace.s_str_dnspso) || f_str_alg_name.equals(NameSpace.s_str_dednspso)) {
-				t_aTC_solution = new ParticleSolution(m_aI4_d);
-			} else if (f_str_alg_name.equals(NameSpace.s_str_fade)) {
-				t_aTC_solution = new FireSparkSolution(m_aI4_d);
-			} else if (f_str_alg_name.equals(NameSpace.s_str_wwo)) {
-				t_aTC_solution = new WaveSolution(m_aI4_d);
-			}
+			t_aTC_solution = new ASolution(m_aI4_d);
+			/*if (f_str_alg_name.equals(NameSpace.s_str_bpso)) {
+				t_aTC_solution = new ASolution(m_aI4_d);
+			} else if (f_str_alg_name.equals(NameSpace.s_str_dnspso)) {
+				t_aTC_solution = new ASolution(m_aI4_d);
+			} else if (f_str_alg_name.equals(NameSpace.s_str_dednspso)) {
+				t_aTC_solution = new ASolution(m_aI4_d);
+			}else if (f_str_alg_name.equals(NameSpace.s_str_wwo)) {
+				t_aTC_solution = new ASolution(m_aI4_d);
+			}*/
 			int[] t_rI4_x = new int[m_aI4_d];
-			for (int t_aI4_i = 0; t_aI4_i < m_aI4_d; t_aI4_i++) {
-				t_rI4_x[t_aI4_i] = m_aTC_random.nextInt(2);
+			int[] t_rI4_bag = new int[m_aI4_n];
+			int[] t_rI4_fac = new int[m_aI4_n];
+			for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
+				int t_aI4_device = 0;
+				int t_aI4_all = 0;
+				while(t_aI4_device>m_aI4_b || t_aI4_all<1){//必须满足约束
+					t_aI4_device = 0;
+					t_aI4_all = 0;
+					for(int t_aI4_k=0;t_aI4_k<m_aI4_k+1;t_aI4_k++){
+						int t_aI4_pos = t_aI4_j*(m_aI4_k+1) + t_aI4_k;
+						t_rI4_x[t_aI4_pos] = m_aTC_random.nextInt(2);
+						if(t_aI4_k<m_aI4_k){
+							t_aI4_device += t_rI4_x[t_aI4_pos];
+							t_aI4_all += t_rI4_x[t_aI4_pos];
+							continue;
+						}
+						t_aI4_all += t_rI4_x[t_aI4_pos];
+					}
+				}
+				t_rI4_bag[t_aI4_j] = t_aI4_device;
+				t_rI4_fac[t_aI4_j] = t_aI4_all;
 			}
 
 			t_aTC_solution.setM_rI4_x(t_rI4_x);
-			m_aTC_population[t_aI4_k] = t_aTC_solution;
-			modify(m_aTC_population[t_aI4_k]);
-			System.out.println("modify end");
-			//reCal(m_aTC_population[t_aI4_k]);
-			evaluate(m_aTC_population[t_aI4_k]);
-			
+			t_aTC_solution.setM_rI4_bag(t_rI4_bag);
+			t_aTC_solution.setM_rI4_fac(t_rI4_fac);
+			m_aTC_population[t_aI4_i] = t_aTC_solution;
+			modify(m_aTC_population[t_aI4_i]);
+			evaluate(m_aTC_population[t_aI4_i]);
 			
 		}
 	}
@@ -342,11 +321,51 @@ public abstract class AStrategy {
 			m_aTC_listOfFitness.add(t_aTC_fitness);
 		}
 	}
+	
+	/**
+	 * 计算Td和Tp
+	 * @param f_aTC_solution
+	 */
+	protected void calTdTp(ASolution f_aTC_solution){
+		int t_rI4_x[] = f_aTC_solution.getM_rI4_x();
+		double t_rI8_tk[] = new double[m_aI4_k];//各个安检设备的检测时间
+		double t_aI8_td = 0;
+		double t_aI8_tp = 0;
+		int t_aI4_z = 0;
+		List<Double> t_aTC_bag = new ArrayList<>();
+		for(int t_aI4_j=0;t_aI4_j<m_aI4_n;t_aI4_j++){
+			for(int t_aI4_k=0;t_aI4_k<m_aI4_k+1;t_aI4_k++){
+				int t_aI4_pos = t_aI4_j*(m_aI4_k+1) + t_aI4_k;
+				int t_aI4_dev = t_aI4_pos%(m_aI4_k+1);
+				if(t_aI4_dev<m_aI4_k){
+					t_rI8_tk[t_aI4_dev] += t_rI4_x[t_aI4_pos]*m_rI8_tdjk[t_aI4_j][t_aI4_k];
+				}else {
+					if(t_rI4_x[t_aI4_pos]==1){
+						t_aTC_bag.add(m_rI8_tpj[t_aI4_j]);
+						t_aI4_z ++;
+					}
+				}
+			}
+		}
+		for(int t_aI4_k=0;t_aI4_k<m_aI4_k;t_aI4_k++){
+			t_aI8_td = Math.max(t_aI8_td, t_rI8_tk[t_aI4_k]);
+		}
+		
+		Collections.sort(t_aTC_bag);
+		int t_aI4_o = t_aI4_z/m_aI4_q-1;
+		for(int t_aI4_l=0;t_aI4_l<=t_aI4_o;t_aI4_l++){
+			int t_aI4_j = t_aI4_l*m_aI4_q + t_aI4_z%m_aI4_q;
+			t_aI8_tp += (t_aTC_bag.get(t_aI4_j)+t_aTC_bag.get(t_aTC_bag.size()-1));
+		}
+		f_aTC_solution.setM_aI8_td(t_aI8_td);
+		f_aTC_solution.setM_aI8_tp(t_aI8_tp);
+	}
 
 	/**
 	 * 【适应度计算 & 同时约束条件的计算】 1.检测时间进行计算 2.各个设备分配的包裹数 3.各个设备的当前容纳量
 	 */
 	protected void evaluate(ASolution f_aTC_solution) {
+		calTdTp(f_aTC_solution);
 		int[] t_rI4_x = f_aTC_solution.getM_rI4_x();
 		double t_aI8_fitness = 0.0;
 		double t_aI8_pij = 0;
@@ -354,26 +373,27 @@ public abstract class AStrategy {
 		for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
 			for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
 				double t_aI8_fail = 1;
-				for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-					int t_aI4_pos = t_aI4_j * m_aI4_k + t_aI4_k;
-					t_aI8_fail *= ((1 - m_rI8_yik[t_aI4_i][t_aI4_k]) * t_rI4_x[t_aI4_pos]);
+				for (int t_aI4_k = 0; t_aI4_k < m_aI4_k+1; t_aI4_k++) {
+					int t_aI4_pos = t_aI4_j * (m_aI4_k+1) + t_aI4_k;
+					if(t_aI4_k<m_aI4_k){
+						t_aI8_fail *= (Math.pow(1 - m_rI8_ydik[t_aI4_i][t_aI4_k], t_rI4_x[t_aI4_pos]));
+					}else {
+						t_aI8_fail *= Math.pow(1-m_rI8_ypi[t_aI4_i], t_rI4_x[t_aI4_pos]);
+					}
 				}
+				
 				t_aI8_pij = 1 - t_aI8_fail;
+				
 				//System.out.println("t_aI8_pij = "+t_aI8_pij);
 				t_rI8_p[t_aI4_i][t_aI4_j] = t_aI8_pij;
 				t_aI8_fitness += m_rI8_wi[t_aI4_i] * m_rI8_bi[t_aI4_i] * t_rI8_p[t_aI4_i][t_aI4_j];
 			}
 		}
 		
-		/*for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
-			for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
-				t_aI8_fitness += m_rI8_wi[t_aI4_i] * m_rI8_bi[t_aI4_i] * t_rI8_p[t_aI4_i][t_aI4_j];
-			}
-		}*/
 		f_aTC_solution.setM_cur_nfe(m_aI4_cur_nfe);
 		f_aTC_solution.setM_cur_iter(m_aI4_cur_iter);
 		f_aTC_solution.setM_aI8_fitness(t_aI8_fitness * m_aI8_a);
-		//reCal(f_aTC_solution);
+		
 	}
 
 	/**
@@ -398,29 +418,25 @@ public abstract class AStrategy {
 		StringBuffer t_aTC_sb = new StringBuffer();
 		int[] t_rI4_x = f_aTC_solution.getM_rI4_x();
 		int[] t_rI4_bag = f_aTC_solution.getM_rI4_bag();
-		double[] t_rI8_vol = f_aTC_solution.getM_rI8_vol();
+		int[] t_rI8_fac = f_aTC_solution.getM_rI4_fac();
 		t_aTC_sb.append(f_aI4_p+" solution:\n");
 		for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
-			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-				t_aTC_sb.append(t_rI4_x[t_aI4_j * m_aI4_k + t_aI4_k]);
-				if (t_aI4_k < m_aI4_k - 1)
+			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k+1; t_aI4_k++) {
+				int t_aI4_pos = t_aI4_j * (m_aI4_k+1) + t_aI4_k;
+				t_aTC_sb.append(t_rI4_x[t_aI4_pos]);
+				if (t_aI4_k < m_aI4_k)
 					t_aTC_sb.append(" ");
 				else if (t_aI4_j < m_aI4_n - 1) {
-					t_aTC_sb.append("(" + t_rI4_bag[t_aI4_j] + ")|");
+					t_aTC_sb.append("(" + t_rI4_bag[t_aI4_j] +","+t_rI8_fac[t_aI4_j]+ ")|");
 				} else {
-					t_aTC_sb.append("(" + t_rI4_bag[t_aI4_j] + ")|fitness = " + f_aTC_solution.getM_aI8_fitness()
-							+ "|ta = " + f_aTC_solution.getM_aI8_ta() + "|th = " + f_aTC_solution.getM_aI8_th() + "|");
+					t_aTC_sb.append("(" + t_rI4_bag[t_aI4_j] +","+t_rI8_fac[t_aI4_j]+ ")|fitness = " + f_aTC_solution.getM_aI8_fitness()
+							+ "|td = " + f_aTC_solution.getM_aI8_td() + "|tp = " + f_aTC_solution.getM_aI8_tp() + "|");
 				}
 			}
 		}
-		for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-			t_aTC_sb.append(t_rI8_vol[t_aI4_k]);
-			if (t_aI4_k < m_aI4_k - 1)
-				t_aTC_sb.append(" ");
-			else {
-				t_aTC_sb.append("|" + (isValidSolution(f_aTC_solution) ? "valid" : "invalid")+"\n");
-			}
-		}
+		
+		t_aTC_sb.append((isValidSolution(f_aTC_solution) ? "valid" : "invalid")+"\n");
+		
 		return t_aTC_sb.toString();
 	}
 
@@ -450,40 +466,32 @@ public abstract class AStrategy {
 	protected void printSolution(ASolution f_aTC_solution) {
 		int[] t_rI4_x = f_aTC_solution.getM_rI4_x();
 		int[] t_rI4_bag = f_aTC_solution.getM_rI4_bag();
-		double[] t_rI8_vol = f_aTC_solution.getM_rI8_vol();
+		int[] t_rI8_fac = f_aTC_solution.getM_rI4_fac();
 		for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
-			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-				System.out.print(t_rI4_x[t_aI4_j * m_aI4_k + t_aI4_k]);
-				if (t_aI4_k < m_aI4_k - 1)
+			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k+1; t_aI4_k++) {
+				int t_aI4_pos = t_aI4_j * (m_aI4_k+1) + t_aI4_k;
+				System.out.print(t_rI4_x[t_aI4_pos]);
+				if (t_aI4_k < m_aI4_k)
 					System.out.print(" ");
 				else if (t_aI4_j < m_aI4_n - 1) {
-					System.out.print("(" + t_rI4_bag[t_aI4_j] + ")|");
+					System.out.print("(" + t_rI4_bag[t_aI4_j] +","+t_rI8_fac[t_aI4_j] +")|");
 				} else {
-					System.out.print("(" + t_rI4_bag[t_aI4_j] + ")|fitness = " + f_aTC_solution.getM_aI8_fitness()
-							+ "|ta = " + f_aTC_solution.getM_aI8_ta() + "|th = " + f_aTC_solution.getM_aI8_th() + "|");
+					System.out.print("(" + t_rI4_bag[t_aI4_j]+","+t_rI8_fac[t_aI4_j] + ")|fitness = " + f_aTC_solution.getM_aI8_fitness()
+							+ "|td = " + f_aTC_solution.getM_aI8_td() + "|tp = " + f_aTC_solution.getM_aI8_tp() + "|");
 				}
 			}
 		}
-		for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-			System.out.print(t_rI8_vol[t_aI4_k]);
-			if (t_aI4_k < m_aI4_k - 1)
-				System.out.print(" ");
-			else {
-				System.out.println("|" + (isValidSolution(f_aTC_solution) ? "valid" : "invalid"));
-			}
+		System.out.println((isValidSolution(f_aTC_solution) ? "valid" : "invalid"));
+		
+	}
+	
+	protected double[] int2doubleArray(int[] f_rI4_arr){
+		double[] t_rI8_res = new double[f_rI4_arr.length];
+		for(int t_aI4_i=0;t_aI4_i<f_rI4_arr.length;t_aI4_i++){
+			t_rI8_res[t_aI4_i] = f_rI4_arr[t_aI4_i];
 		}
+		return t_rI8_res;
 	}
 
-	protected void printConstraint() {
-		System.out.println("==========约束==========");
-		System.out.println("Ta = " + m_aI8_ta + ", Th = " + m_aI8_th);
-		for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-			System.out.print(m_rI8_ck[t_aI4_k]);
-			if (t_aI4_k < m_aI4_k - 1)
-				System.out.print(" ");
-			else
-				System.out.println();
-		}
-	}
 
 }
