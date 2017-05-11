@@ -105,7 +105,7 @@ public class RandomGenerateData {
 	private void genVk(String f_str_path) {
 		StringBuffer t_aTC_res = new StringBuffer();
 		for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-			t_aTC_res.append(MathUtils.formatD(randDoubleAToB(0.5, 1), 3));
+			t_aTC_res.append(MathUtils.formatD(randDoubleAToB(1, 3), 3));
 			if (t_aI4_k < m_aI4_k - 1) {
 				t_aTC_res.append(" ");
 			}
@@ -121,7 +121,7 @@ public class RandomGenerateData {
 	private void genLj(String f_str_path) {
 		StringBuffer t_aTC_res = new StringBuffer();
 		for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
-			t_aTC_res.append(MathUtils.formatD(randDoubleAToB(0, 3), 3));
+			t_aTC_res.append(MathUtils.formatD(randDoubleAToB(0, 10), 3));
 			if (t_aI4_j < m_aI4_n - 1) {
 				t_aTC_res.append(" ");
 			}
@@ -178,7 +178,8 @@ public class RandomGenerateData {
 		StringBuffer t_aTC_res = new StringBuffer();
 		for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
 			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
-				t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.6, 0.9)));
+				//t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.6, 0.9)));
+				t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.5, 1)));
 				if (t_aI4_k < m_aI4_k - 1) {
 					t_aTC_res.append(" ");
 				} else if (t_aI4_i < m_aI4_m - 1) {
@@ -197,7 +198,8 @@ public class RandomGenerateData {
 	private void genYpi(String f_str_path) {
 		StringBuffer t_aTC_res = new StringBuffer();
 		for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
-			t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.3, 0.7)));
+//			t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.3, 0.7)));
+			t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0, 0.2)));
 			if (t_aI4_i < m_aI4_m - 1) {
 				t_aTC_res.append(" ");
 			}
@@ -224,8 +226,8 @@ public class RandomGenerateData {
 	}
 
 	public static void main(String[] args) {
-		RandomGenerateData t_aTC_genData = new RandomGenerateData(31, 460, 17, 3);
-		t_aTC_genData.genExpData("data_03");
+		RandomGenerateData t_aTC_genData = new RandomGenerateData(12, 285, 9, 10);
+		t_aTC_genData.genExpData("data_02");
 		System.out.println("数据生成成功！");
 	}
 }

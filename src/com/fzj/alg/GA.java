@@ -289,8 +289,8 @@ public class GA extends AStrategy {
 
 		// 打印函数，用于测试调试
 		{
-
-		/*	System.out.println("==========初始化种群==========");
+/*
+			System.out.println("==========初始化种群==========");
 			printPopulation(m_aTC_population);
 			System.out.println("==========当前最优解==========");
 			printSolution(m_aTC_best);*/
@@ -311,8 +311,8 @@ public class GA extends AStrategy {
 	}
 
 	public static void main(String[] args) {
-		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_01);
-		AStrategy t_aTC_strategy = new GA(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_01);
+		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_02);
+		AStrategy t_aTC_strategy = new GA(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_02);
 		t_aTC_strategy.solve(0);
 	}
 }

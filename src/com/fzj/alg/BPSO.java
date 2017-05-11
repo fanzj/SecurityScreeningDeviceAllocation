@@ -33,12 +33,12 @@ public class BPSO extends AStrategy {
 
 	@Override
 	protected void init() {
-		this.m_aI8_c1 = 1.8;
-		this.m_aI8_c2 = 1.8;
+		this.m_aI8_c1 = 1.496180;
+		this.m_aI8_c2 = 1.496180;
 		this.m_aI8_wmin = 0.4;
 		this.m_aI8_wmax = 0.9;
 
-		this.m_aI8_w = m_aI8_wmax;
+		this.m_aI8_w = 0.729844;
 		this.m_aTC_population = new ASolution[m_aI4_size];
 
 		this.m_aI4_vmax = 5;
@@ -53,7 +53,7 @@ public class BPSO extends AStrategy {
 	 * 惯量权重的更新
 	 */
 	private void updateW() {
-		m_aI8_w = m_aI8_wmax - ((double) m_aI4_cur_iter / (double) m_aI4_max_iter) * (m_aI8_wmax - m_aI8_wmin);
+		//m_aI8_w = m_aI8_wmax - ((double) m_aI4_cur_iter / (double) m_aI4_max_iter) * (m_aI8_wmax - m_aI8_wmin);
 	}
 
 	/**
@@ -179,14 +179,14 @@ public class BPSO extends AStrategy {
 
 		// 打印函数，用于测试调试
 		{
-			/*
-			 * System.out.println("==========初始化种群==========");
-			 * printPopulation(m_aTC_population);
-			 * System.out.println("==========历史最优种群==========");
-			 * printPopulation(m_aTC_pBest);
-			 * System.out.println("==========全局最优粒子==========");
-			 * printSolution(m_aTC_gBest);
-			 */
+			
+			 /* System.out.println("==========初始化种群==========");
+			  printPopulation(m_aTC_population);
+			  System.out.println("==========历史最优种群==========");
+			  printPopulation(m_aTC_pBest);
+			  System.out.println("==========全局最优粒子==========");
+			  printSolution(m_aTC_gBest);*/
+			 
 		}
 
 		// 种群进化
@@ -204,8 +204,8 @@ public class BPSO extends AStrategy {
 	}
 
 	public static void main(String[] args) {
-		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_01);
-		AStrategy t_aTC_strategy = new BPSO(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_01);
+		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_02);
+		AStrategy t_aTC_strategy = new BPSO(10, 1000, 20, t_aTC_ssm, NameSpace.s_str_data_02);
 		t_aTC_strategy.solve(0);
 	}
 
