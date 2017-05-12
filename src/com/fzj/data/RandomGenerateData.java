@@ -179,7 +179,7 @@ public class RandomGenerateData {
 		for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
 			for (int t_aI4_k = 0; t_aI4_k < m_aI4_k; t_aI4_k++) {
 				//t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.6, 0.9)));
-				t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.5, 1)));
+				t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0, 1)));
 				if (t_aI4_k < m_aI4_k - 1) {
 					t_aTC_res.append(" ");
 				} else if (t_aI4_i < m_aI4_m - 1) {
@@ -199,7 +199,7 @@ public class RandomGenerateData {
 		StringBuffer t_aTC_res = new StringBuffer();
 		for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
 //			t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0.3, 0.7)));
-			t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0, 0.2)));
+			t_aTC_res.append(MathUtils.formatD8(randDoubleAToB(0, 1)));
 			if (t_aI4_i < m_aI4_m - 1) {
 				t_aTC_res.append(" ");
 			}
@@ -226,8 +226,8 @@ public class RandomGenerateData {
 	}
 
 	public static void main(String[] args) {
-		RandomGenerateData t_aTC_genData = new RandomGenerateData(12, 285, 9, 10);
-		t_aTC_genData.genExpData("data_02");
+		RandomGenerateData t_aTC_genData = new RandomGenerateData(31,430,21,20);
+		t_aTC_genData.genExpData("data_03");
 		System.out.println("数据生成成功！");
 	}
 }

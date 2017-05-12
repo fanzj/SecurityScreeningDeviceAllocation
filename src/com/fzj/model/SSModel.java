@@ -101,7 +101,7 @@ public class SSModel {
 		this.m_aI4_k = t_aTC_map.get(NameSpace.s_str_k);
 		this.m_aI4_q = t_aTC_map.get(NameSpace.s_str_q);
 		this.m_aI4_d = m_aI4_n * (m_aI4_k + 1);
-		this.m_aI4_b = 3;
+		this.m_aI4_b = 2;
 		this.m_aI8_landa = 15;
 		this.m_aI8_u = m_aI8_landa * m_aI4_n;
 		this.m_rI8_wi = FileUtils.read1D(f_str_path, NameSpace.s_str_wi, m_aI4_m);

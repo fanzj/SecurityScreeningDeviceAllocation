@@ -73,45 +73,21 @@ public class BDE extends AStrategy{
 	
 	@Override
 	protected void initPopulation(String f_str_alg_name) {//这样每个都一样
+		super.initPopulation(f_str_alg_name);
 		double[] t_rI8_x = new double[4];
 		double[] t_rI8_v = new double[4];
 		double[] t_rI8_a = {0,1,1,0};
 		for (int t_aI4_i = 0; t_aI4_i < m_aI4_size; t_aI4_i++) {
-			ASolution t_aTC_solution = new ASolution(m_aI4_d);
-			int[] t_rI4_x = new int[m_aI4_d];
 			
-			if(t_aI4_i>0){
-				for(int t_aI4_j=0;t_aI4_j<4;t_aI4_j++){
-					t_rI8_x[t_aI4_j] = MathUtils.getDoubleAToB(-5, m_aI4_vmax);
-					t_rI8_v[t_aI4_j] = t_rI8_x[t_aI4_j];
-				}
-			}else {
-				for(int t_aI4_j=0;t_aI4_j<4;t_aI4_j++){
-					t_rI8_x[t_aI4_j] = t_rI8_a[t_aI4_j];
-					t_rI8_v[t_aI4_j] = t_rI8_a[t_aI4_j];
-				}
+			for(int t_aI4_j=0;t_aI4_j<4;t_aI4_j++){
+				t_rI8_x[t_aI4_j] = t_rI8_a[t_aI4_j];
+				t_rI8_v[t_aI4_j] = t_rI8_a[t_aI4_j];
 			}
 			
 			FourTupple t_aTC_f = new FourTupple();
 			t_aTC_f.setM_rI8_x(t_rI8_x);
 			t_aTC_f.setM_rI8_v(t_rI8_v);
 			m_aTC_ft[t_aI4_i] = t_aTC_f;
-			
-			for(int t_aI4_j=0;t_aI4_j<m_aI4_d;t_aI4_j++){	
-				evaluate2(t_aTC_f,t_aI4_j);
-				if(Double.compare(t_aTC_f.getM_aI8_g(), 0)>0){
-					t_rI4_x[t_aI4_j] = 1;
-				}else {
-					t_rI4_x[t_aI4_j] = 0;
-				}
-			}
-
-			t_aTC_solution.setM_rI4_x(t_rI4_x);
-		
-			m_aTC_population[t_aI4_i] = t_aTC_solution;
-			modify(m_aTC_population[t_aI4_i]);
-			evaluate(m_aTC_population[t_aI4_i]);
-			
 		}
 	}
 	
@@ -125,6 +101,7 @@ public class BDE extends AStrategy{
 		for(int t_aI4_k=0;t_aI4_k<m_aI4_size;t_aI4_k++){
 			if(Double.compare(m_aTC_gBest.getM_aI8_fitness(), m_aTC_population[t_aI4_k].getM_aI8_fitness())<0){
 				m_aTC_gBest =  m_aTC_population[t_aI4_k].clone();
+				//m_aTC_ft_gBest = m_aTC_ft[t_aI4_k].clone();
 			}
 		}
 	}
@@ -153,11 +130,11 @@ public class BDE extends AStrategy{
 			}
 		}
 	}
-	
-	private ASolution generateFT(FourTupple f_aTC_s,ASolution f_aTC_so){
-		ASolution t_aTC_so = f_aTC_so.clone();
-		int[] t_rI4_x = t_aTC_so.getM_rI4_x();
-		for (int t_aI4_i = 0; t_aI4_i < m_aI4_size; t_aI4_i++) {
+
+	private double getFitFromFourTupple(FourTupple f_aTC_s, int f_aI4_index){
+		ASolution t_aTC_so = m_aTC_population[f_aI4_index].clone();
+		int t_rI4_x[] = t_aTC_so.getM_rI4_x();
+		for (int t_aI4_i = 0; t_aI4_i < m_aI4_d; t_aI4_i++) {
 			evaluate2(f_aTC_s,t_aI4_i);
 			if(Double.compare(f_aTC_s.getM_aI8_g(), 0)>0){
 				t_rI4_x[t_aI4_i] = 1;
@@ -165,11 +142,8 @@ public class BDE extends AStrategy{
 				t_rI4_x[t_aI4_i] = 0;
 			}
 		}
-		modify(t_aTC_so);
 		evaluate(t_aTC_so);
-		saveFitness(m_aTC_gBest);
-		m_aI4_cur_nfe++;
-		return t_aTC_so;
+		return t_aTC_so.getM_aI8_fitness();
 	}
 	
 
@@ -217,11 +191,11 @@ public class BDE extends AStrategy{
 					}
 
 					// 交叉
-					int t_aI4_ri = m_aTC_random.nextInt(m_aI4_size);
+					int t_aI4_ri = m_aTC_random.nextInt(4);
 					double[] t_rI8_ui = new double[4];
 					for (int t_aI4_j = 0; t_aI4_j < 4; t_aI4_j++) {
 						double t_aI8_r = m_aTC_random.nextDouble();
-						if (Double.compare(t_aI8_r, m_aI8_Cr) < 0 || t_aI4_j == t_aI4_ri) {
+						if (Double.compare(t_aI8_r, m_aI8_Cr) <= 0 || t_aI4_j == t_aI4_ri) {
 							t_rI8_ui[t_aI4_j] = t_rI4_vig2[t_aI4_j];
 						} else {
 							t_rI8_ui[t_aI4_j] = t_rI8_xi[t_aI4_j];
@@ -236,9 +210,7 @@ public class BDE extends AStrategy{
 					saveFitness(m_aTC_gBest);
 					m_aI4_cur_nfe++;
 
-					ASolution t_aTC_so1 = generateFT(t_aTC_part, m_aTC_population[t_aI4_i]);
-					ASolution t_aTC_so2 = generateFT(t_aTC_pit, m_aTC_population[t_aI4_i]);
-					if(Double.compare(t_aTC_so1.getM_aI8_fitness(), t_aTC_so2.getM_aI8_fitness())>=0){
+					if(Double.compare(getFitFromFourTupple(t_aTC_part,t_aI4_i), getFitFromFourTupple(t_aTC_pit, t_aI4_i))>=0){
 						m_aTC_ft[t_aI4_i] = t_aTC_part;
 					}
 					
@@ -284,8 +256,8 @@ public class BDE extends AStrategy{
 	}
 	
 	public static void main(String[] args) {
-		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_01);
-		AStrategy t_aTC_strategy = new BDE(10, 1000, 20, t_aTC_ssm, NameSpace.s_str_data_01);	
+		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_02);
+		AStrategy t_aTC_strategy = new BDE(10, 5000, 100, t_aTC_ssm, NameSpace.s_str_data_02);	
 	    t_aTC_strategy.solve(0);
 	}
 	

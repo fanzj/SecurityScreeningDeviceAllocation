@@ -18,8 +18,6 @@ public class BPSO extends AStrategy {
 	private int m_aI4_vmax;// 最大速度
 	private int m_aI4_vmin;
 	private double m_aI8_w;// 惯性权重
-	private double m_aI8_wmin;// 最小权重系数
-	private double m_aI8_wmax;// 最大权重系数
 	public ASolution m_aTC_gBest;// 全局最优粒子
 	private ASolution[] m_aTC_pBest;// 历史最优粒子
 
@@ -35,8 +33,6 @@ public class BPSO extends AStrategy {
 	protected void init() {
 		this.m_aI8_c1 = 1.496180;
 		this.m_aI8_c2 = 1.496180;
-		this.m_aI8_wmin = 0.4;
-		this.m_aI8_wmax = 0.9;
 
 		this.m_aI8_w = 0.729844;
 		this.m_aTC_population = new ASolution[m_aI4_size];

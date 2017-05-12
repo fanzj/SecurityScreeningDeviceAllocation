@@ -121,7 +121,7 @@ public class NameSpace {
 	/**
 	 * DNSPSO算法
 	 */
-	public static final String s_str_dnspso = "DNSPSO";
+	public static final String s_str_amdnspso = "AMDNSPSO";
 	
 	public static final String s_str_bpso = "BPSO";
 	
@@ -175,6 +175,11 @@ public class NameSpace {
 	 * 最大评价次数
 	 */
 	public static final String s_str_max_nfe = "max_nfe";
+	
+	/**
+	 * 最大迭代次数
+	 */
+	public static final String s_str_max_iter = "max_iter";
 	
 	/**
 	 * DNSPSO的最大迭代次数

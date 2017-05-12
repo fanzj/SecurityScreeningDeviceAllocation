@@ -1,13 +1,5 @@
 package com.fzj.alg;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-
-import javax.xml.transform.Templates;
-
 import com.fzj.config.NameSpace;
 import com.fzj.model.SSModel;
 import com.fzj.solution.ASolution;
@@ -170,7 +162,7 @@ public class GA extends AStrategy {
 	 * @param k2
 	 */
 	private void cross(int f_aI4_k1,int f_aI4_k2){
-		int t_aI4_i, t_aI4_j, t_aI4_k, t_aI4_flag;
+		int t_aI4_i;
 		int t_aI4_ran1, t_aI4_ran2, t_aI4_temp;
 		int[] t_rI4_Gh1 = new int[m_aI4_d];
 		int[] t_rI4_Gh2 = new int[m_aI4_d];

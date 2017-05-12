@@ -60,8 +60,8 @@ public class AlgRun {
 		for(int t_aI4_i=0;t_aI4_i<f_aI4_run_times;t_aI4_i++){
 			if (m_str_alg_type.equals(NameSpace.s_str_bpso)) {
 				t_aTC_strategy = new BPSO(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
-			}else if(m_str_alg_type.equals(NameSpace.s_str_dnspso)){
-				t_aTC_strategy = new DNSBPSO(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+			}else if(m_str_alg_type.equals(NameSpace.s_str_amdnspso)){
+				t_aTC_strategy = new AMDNSPSO(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
 			}else if(m_str_alg_type.equals(NameSpace.s_str_bde)){
 				t_aTC_strategy = new BDE(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
 			}else if(m_str_alg_type.equals(NameSpace.s_str_ga)){

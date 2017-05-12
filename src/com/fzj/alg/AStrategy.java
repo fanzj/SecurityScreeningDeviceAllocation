@@ -377,25 +377,27 @@ public abstract class AStrategy {
 					int t_aI4_pos = t_aI4_j * (m_aI4_k+1) + t_aI4_k;
 					if(t_aI4_k<m_aI4_k){
 						t_aI8_fail *= (Math.pow(1 - m_rI8_ydik[t_aI4_i][t_aI4_k], t_rI4_x[t_aI4_pos]));
+					//	break;
 					}else {
 						t_aI8_fail *= Math.pow(1-m_rI8_ypi[t_aI4_i], t_rI4_x[t_aI4_pos]);
 					}
 				}
 				
 				t_aI8_pij = 1 - t_aI8_fail;
-			
+				//System.out.println("pij = "+t_aI8_pij);
 				t_rI8_p[t_aI4_i][t_aI4_j] = t_aI8_pij;
-				//t_rI8_p[t_aI4_i][t_aI4_j] = MathUtils.getDoubleAToB(0, 10);
-				t_aI8_sum += m_aI8_a * m_rI8_bi[t_aI4_i] * t_rI8_p[t_aI4_i][t_aI4_j];
+				
+				//t_aI8_sum += m_aI8_a * m_rI8_bi[t_aI4_i] * t_rI8_p[t_aI4_i][t_aI4_j];
+				t_aI8_fitness += m_rI8_wi[t_aI4_i] * m_aI8_a * m_rI8_bi[t_aI4_i] * t_rI8_p[t_aI4_i][t_aI4_j];
 			}
 		}
 		
-		for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
+	/*	for (int t_aI4_i = 0; t_aI4_i < m_aI4_m; t_aI4_i++) {
 			for (int t_aI4_j = 0; t_aI4_j < m_aI4_n; t_aI4_j++) {
 				t_aI8_fitness += m_rI8_wi[t_aI4_i] * ((m_aI8_a * m_rI8_bi[t_aI4_i] * t_rI8_p[t_aI4_i][t_aI4_j])/t_aI8_sum);
 			}
-		}
-		System.out.println("t_aI8_sum = "+t_aI8_sum+", t_aI8_fitness = "+t_aI8_fitness);
+		}*/
+		//System.out.println("t_aI8_sum = "+t_aI8_sum+", t_aI8_fitness = "+t_aI8_fitness);
 		f_aTC_solution.setM_cur_nfe(m_aI4_cur_nfe);
 		f_aTC_solution.setM_cur_iter(m_aI4_cur_iter);
 		f_aTC_solution.setM_aI8_fitness(t_aI8_fitness);

@@ -20,8 +20,7 @@ public class AMPSO extends AStrategy {
 	private int m_aI4_vmax;// 最大速度
 	private int m_aI4_vmin;
 	private double m_aI8_w;// 惯性权重
-	private double m_aI8_wmin;// 最小权重系数
-	private double m_aI8_wmax;// 最大权重系数
+	
 	public ASolution m_aTC_gBest;// 全局最优粒子
 	private ASolution[] m_aTC_pBest;// 历史最优粒子
 	
@@ -42,10 +41,9 @@ public class AMPSO extends AStrategy {
 	protected void init() {
 		this.m_aI8_c1 = 1.49618;
 		this.m_aI8_c2 = 1.49618;
-		this.m_aI8_wmin = 0.4;
-		this.m_aI8_wmax = 0.9;
+		
 
-		this.m_aI8_w = m_aI8_wmax;
+		this.m_aI8_w = 0.729844;
 		this.m_aTC_population = new ASolution[m_aI4_size];
 		this.m_aTC_ft = new FourTupple[m_aI4_size];
 
@@ -57,12 +55,7 @@ public class AMPSO extends AStrategy {
 
 	}
 
-	/**
-	 * 惯量权重的更新
-	 */
-	private void updateW() {
-		m_aI8_w = m_aI8_wmax - ((double) m_aI4_cur_iter / (double) m_aI4_max_iter) * (m_aI8_wmax - m_aI8_wmin);
-	}
+
 
 	/**
 	 * 初始化种群后，位移的初始化
@@ -84,6 +77,26 @@ public class AMPSO extends AStrategy {
 	}
 	
 	@Override
+	protected void initPopulation(String f_str_alg_name) {
+		super.initPopulation(f_str_alg_name);
+		double[] t_rI8_x = new double[4];
+		double[] t_rI8_v = new double[4];
+		double[] t_rI8_a = {0,1,1,0};
+		for (int t_aI4_i = 0; t_aI4_i < m_aI4_size; t_aI4_i++) {
+			
+			for(int t_aI4_j=0;t_aI4_j<4;t_aI4_j++){
+				t_rI8_x[t_aI4_j] = t_rI8_a[t_aI4_j];
+				t_rI8_v[t_aI4_j] = t_rI8_a[t_aI4_j];
+			}
+			
+			FourTupple t_aTC_f = new FourTupple();
+			t_aTC_f.setM_rI8_x(t_rI8_x);
+			t_aTC_f.setM_rI8_v(t_rI8_v);
+			m_aTC_ft[t_aI4_i] = t_aTC_f;
+		}
+	}
+	
+	/*@Override
 	protected void initPopulation(String f_str_alg_name) {//这样每个都一样
 		double[] t_rI8_x = new double[4];
 		double[] t_rI8_v = new double[4];
@@ -125,7 +138,7 @@ public class AMPSO extends AStrategy {
 			evaluate(m_aTC_population[t_aI4_i]);
 			
 		}
-	}
+	}*/
 
 	/**
 	 * 全局最优和历史最优粒子的更新
@@ -235,7 +248,7 @@ public class AMPSO extends AStrategy {
 			}
 			//printPopulation(m_aTC_population);
 			
-			updateW();
+		//	updateW();
 			m_aI4_cur_iter++;
 			
 		}
@@ -259,7 +272,7 @@ public class AMPSO extends AStrategy {
 
 		// 打印函数，用于测试调试
 		{
-		/*	System.out.println("==========初始化种群==========");
+			/*System.out.println("==========初始化种群==========");
 			printPopulation(m_aTC_population);
 			System.out.println("==========历史最优种群==========");
 			printPopulation(m_aTC_pBest);
@@ -284,8 +297,8 @@ public class AMPSO extends AStrategy {
 	}
 
 	public static void main(String[] args) {
-		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_01);
-		AStrategy t_aTC_strategy = new AMPSO(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_01);
+		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_02);
+		AStrategy t_aTC_strategy = new AMPSO(10, 5000, 100, t_aTC_ssm, NameSpace.s_str_data_02);
 		t_aTC_strategy.solve(0);
 	}
 
