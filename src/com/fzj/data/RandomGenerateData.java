@@ -226,8 +226,8 @@ public class RandomGenerateData {
 	}
 
 	public static void main(String[] args) {
-		RandomGenerateData t_aTC_genData = new RandomGenerateData(31,430,21,20);
-		t_aTC_genData.genExpData("data_03");
+		RandomGenerateData t_aTC_genData = new RandomGenerateData(57,780,32,30);
+		t_aTC_genData.genExpData("data_04");
 		System.out.println("数据生成成功！");
 	}
 }
