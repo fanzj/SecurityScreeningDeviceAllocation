@@ -24,6 +24,8 @@ public class DNSPSOStrategy extends AStrategy{
 	private int m_aI4_vmin;
 	private int m_aI4_xmax;//位移上限
 	private int m_aI4_xmin;
+	private int m_aI4_ymax;//位移上限
+	private int m_aI4_ymin;
 	private double m_aI8_w;//惯性权重
 	private double m_aI8_wmin;//最小权重系数
 	private double m_aI8_wmax;//最大权重系数
@@ -36,7 +38,6 @@ public class DNSPSOStrategy extends AStrategy{
 	private int m_aI4_K;
 	private double m_aI8_r1,m_aI8_r2,m_aI8_r3,m_aI8_r4,m_aI8_r5,m_aI8_r6;//用于邻域搜索生成的随机数
 	
-	private ReentrantLock m_aTC_lock;
 	
     public DNSPSOStrategy() {
     	super();
@@ -59,16 +60,17 @@ public class DNSPSOStrategy extends AStrategy{
 		this.m_aI8_w = m_aI8_wmax;
 		this.m_aTC_population = new ParticleSolution[m_aI4_size];
 		
-		this.m_aI4_vmax = 1;
-		this.m_aI4_vmin = 0;
-		this.m_aI4_xmax = 1;
-		this.m_aI4_xmin = 0;
+		this.m_aI4_vmax = 3;
+		this.m_aI4_vmin = -3;
+		this.m_aI4_xmax = m_aI4_k;
+		this.m_aI4_xmin = 1;
+		this.m_aI4_ymax = m_aI4_q;
+		this.m_aI4_ymin = 0;
 	
 		
 		m_str_alg_name = NameSpace.s_str_dnspso;
 		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt,m_aI4_max_nfe);
-		
-		m_aTC_lock = new ReentrantLock();
+
 	}
 	
 	/**
@@ -135,7 +137,7 @@ public class DNSPSOStrategy extends AStrategy{
 			t_aI8_r2 = m_aTC_random.nextDouble();
 			double t_aI8_temp_v = m_aI8_w * t_rI4_cur_v[t_aI4_j] + m_aI8_c1 * t_aI8_r1 * (t_rI4_xp[t_aI4_j] - t_rI4_cur_x[t_aI4_j]) 
 					+ m_aI8_c2 * t_aI8_r2 * (t_rI4_xg[t_aI4_j] - t_rI4_cur_x[t_aI4_j]);
-			t_rI4_new_v[t_aI4_j] = new Double(Math.round(t_aI8_temp_v)).intValue();
+			t_rI4_new_v[t_aI4_j] = (int) Math.round(t_aI8_temp_v);
 			//System.out.println("t_rI4_new_v = "+t_rI4_new_v[t_aI4_j]);
 			if(t_rI4_new_v[t_aI4_j] > m_aI4_vmax){
 				t_rI4_new_v[t_aI4_j] = m_aI4_vmax;
@@ -144,11 +146,20 @@ public class DNSPSOStrategy extends AStrategy{
 				t_rI4_new_v[t_aI4_j] = m_aI4_vmin;
 			}
 			t_rI4_new_x[t_aI4_j] = t_rI4_cur_x[t_aI4_j] + t_rI4_new_v[t_aI4_j];
-			if(t_rI4_new_x[t_aI4_j] > m_aI4_xmax){
-				t_rI4_new_x[t_aI4_j] = m_aI4_xmax;
-			}else if(t_rI4_new_x[t_aI4_j] < m_aI4_xmin){
-				t_rI4_new_x[t_aI4_j] = m_aI4_xmin;
+			if(t_aI4_j%2==0){
+				if(t_rI4_new_x[t_aI4_j] > m_aI4_xmax){
+					t_rI4_new_x[t_aI4_j] = m_aI4_xmax;
+				}else if(t_rI4_new_x[t_aI4_j] < m_aI4_xmin){
+					t_rI4_new_x[t_aI4_j] = m_aI4_xmin;
+				}
+			}else {
+				if(t_rI4_new_x[t_aI4_j] > m_aI4_ymax){
+					t_rI4_new_x[t_aI4_j] = m_aI4_ymax;
+				}else if(t_rI4_new_x[t_aI4_j] < m_aI4_ymin){
+					t_rI4_new_x[t_aI4_j] = m_aI4_ymin;
+				}
 			}
+			
 			//System.out.println("t_rI4_new_x = "+t_rI4_new_x[t_aI4_j]);
 		}
 		f_aTC_solution.setM_rI4_x(t_rI4_new_x);
@@ -318,11 +329,20 @@ public class DNSPSOStrategy extends AStrategy{
 			t_rI4_lvi[t_aI4_j] = t_rI4_vi[t_aI4_j];
 //			System.out.println("t_aI8_temp_x = "+t_aI8_temp_x);
 //			System.out.println("t_rI4_lxi = "+t_rI4_lxi[t_aI4_j]);
-			if(t_rI4_lxi[t_aI4_j] > m_aI4_xmax){
-				t_rI4_lxi[t_aI4_j] = m_aI4_xmax;
-			}else if(t_rI4_lxi[t_aI4_j] < m_aI4_xmin){
-				t_rI4_lxi[t_aI4_j] = m_aI4_xmin;
+			if(t_aI4_j%2==0){
+				if(t_rI4_lxi[t_aI4_j] > m_aI4_xmax){
+					t_rI4_lxi[t_aI4_j] = m_aI4_xmax;
+				}else if(t_rI4_lxi[t_aI4_j] < m_aI4_xmin){
+					t_rI4_lxi[t_aI4_j] = m_aI4_xmin;
+				}
+			}else {
+				if(t_rI4_lxi[t_aI4_j] > m_aI4_ymax){
+					t_rI4_lxi[t_aI4_j] = m_aI4_ymax;
+				}else if(t_rI4_lxi[t_aI4_j] < m_aI4_ymin){
+					t_rI4_lxi[t_aI4_j] = m_aI4_ymin;
+				}
 			}
+			
 			if(t_rI4_lvi[t_aI4_j] > m_aI4_vmax){
 				t_rI4_lvi[t_aI4_j] = m_aI4_vmax;
 			}else if(t_rI4_lvi[t_aI4_j] < m_aI4_vmin){
@@ -367,10 +387,19 @@ public class DNSPSOStrategy extends AStrategy{
 			double t_aI8_temp_x = m_aI8_r4 * t_rI4_xi[t_aI4_j] + m_aI8_r5 * t_rI4_gbestxi[t_aI4_j] + m_aI8_r6 * (t_rI4_xe[t_aI4_j]-t_rI4_xf[t_aI4_j]);
 			t_rI4_gxi[t_aI4_j] = new Double(Math.round(t_aI8_temp_x)).intValue();
 			t_rI4_gvi[t_aI4_j] = t_rI4_vi[t_aI4_j];
-			if(t_rI4_gxi[t_aI4_j] > m_aI4_xmax){
-				t_rI4_gxi[t_aI4_j] = m_aI4_xmax;
-			}else if(t_rI4_gxi[t_aI4_j] < m_aI4_xmin){
-				t_rI4_gxi[t_aI4_j] = m_aI4_xmin;
+			
+			if(t_aI4_j%2==0){
+				if(t_rI4_gxi[t_aI4_j] > m_aI4_xmax){
+					t_rI4_gxi[t_aI4_j] = m_aI4_xmax;
+				}else if(t_rI4_gxi[t_aI4_j] < m_aI4_xmin){
+					t_rI4_gxi[t_aI4_j] = m_aI4_xmin;
+				}
+			}else {
+				if(t_rI4_gxi[t_aI4_j] > m_aI4_ymax){
+					t_rI4_gxi[t_aI4_j] = m_aI4_ymax;
+				}else if(t_rI4_gxi[t_aI4_j] < m_aI4_ymin){
+					t_rI4_gxi[t_aI4_j] = m_aI4_ymin;
+				}
 			}
 			if(t_rI4_gvi[t_aI4_j] > m_aI4_vmax){
 				t_rI4_gvi[t_aI4_j] = m_aI4_vmax;
@@ -420,8 +449,7 @@ public class DNSPSOStrategy extends AStrategy{
 				
 		//打印函数，用于测试调试
 		{
-			/*printConstraint();
-			System.out.println("==========初始化种群==========");
+			/*System.out.println("==========初始化种群==========");
 			printPopulation(m_aTC_population);
 			System.out.println("==========历史最优种群==========");
 			printPopulation(m_aTC_pBest);
@@ -444,8 +472,8 @@ public class DNSPSOStrategy extends AStrategy{
 	}
 	
 	public static void main(String[] args) {
-		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_01);
-		AStrategy t_aTC_strategy = new DNSPSOStrategy(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_01);	
+		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_02);
+		AStrategy t_aTC_strategy = new DNSPSOStrategy(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_02);	
 	    t_aTC_strategy.solve(0);
 	}
 	

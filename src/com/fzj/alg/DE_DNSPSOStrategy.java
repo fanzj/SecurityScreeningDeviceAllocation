@@ -24,6 +24,8 @@ public class DE_DNSPSOStrategy extends AStrategy{
 	private int m_aI4_vmin;
 	private int m_aI4_xmax;//位移上限
 	private int m_aI4_xmin;
+	private int m_aI4_ymax;//位移上限
+	private int m_aI4_ymin;
 	private double m_aI8_w;//惯性权重
 	private double m_aI8_wmin;//最小权重系数
 	private double m_aI8_wmax;//最大权重系数
@@ -49,8 +51,8 @@ public class DE_DNSPSOStrategy extends AStrategy{
     
 	@Override
 	protected void init() {
-		this.m_aI8_c1 = 2;//1.49618
-		this.m_aI8_c2 = 2;
+		this.m_aI8_c1 = 1.49618;//1.49618
+		this.m_aI8_c2 = 1.49618;
 		this.m_aI8_wmin = 0.4;
 		this.m_aI8_wmax = 0.9;
 		this.m_aI8_pr = 0.9;
@@ -63,10 +65,12 @@ public class DE_DNSPSOStrategy extends AStrategy{
 		this.m_aI8_w = m_aI8_wmax;
 		this.m_aTC_population = new ParticleSolution[m_aI4_size];
 	
-		this.m_aI4_vmax = 1;
-		this.m_aI4_vmin = 0;
-		this.m_aI4_xmax = 1;
-		this.m_aI4_xmin = 0;
+		this.m_aI4_vmax = 3;
+		this.m_aI4_vmin = -3;
+		this.m_aI4_xmax = m_aI4_k;
+		this.m_aI4_xmin = 1;
+		this.m_aI4_ymax = m_aI4_q;
+		this.m_aI4_ymin = 0;
 		
 		m_str_alg_name = NameSpace.s_str_dednspso;
 		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt,m_aI4_max_nfe);
@@ -155,10 +159,19 @@ public class DE_DNSPSOStrategy extends AStrategy{
 					for (int t_aI4_j = 0; t_aI4_j < m_aI4_d; t_aI4_j++) {
 						t_rI4_vig2[t_aI4_j] = (int) (t_rI4_xr1[t_aI4_j]
 								+ Math.round(m_aI8_f * (t_rI4_xr2[t_aI4_j] - t_rI4_xr3[t_aI4_j])));
-						if (t_rI4_vig2[t_aI4_j] > m_aI4_vmax)
-							t_rI4_vig2[t_aI4_j] = m_aI4_vmax;
-						if (t_rI4_vig2[t_aI4_j] < m_aI4_vmin)
-							t_rI4_vig2[t_aI4_j] = m_aI4_vmin;
+						if(t_aI4_j%2==0){
+							if(t_rI4_vig2[t_aI4_j] > m_aI4_xmax){
+								t_rI4_vig2[t_aI4_j] = m_aI4_xmax;
+							}else if(t_rI4_vig2[t_aI4_j] < m_aI4_xmin){
+								t_rI4_vig2[t_aI4_j] = m_aI4_xmin;
+							}
+						}else {
+							if(t_rI4_vig2[t_aI4_j] > m_aI4_ymax){
+								t_rI4_vig2[t_aI4_j] = m_aI4_ymax;
+							}else if(t_rI4_vig2[t_aI4_j] < m_aI4_ymin){
+								t_rI4_vig2[t_aI4_j] = m_aI4_ymin;
+							}
+						}
 					}
 
 					// 交叉
@@ -276,10 +289,19 @@ public class DE_DNSPSOStrategy extends AStrategy{
 			double t_aI8_temp_x = m_aI8_r1 * t_rI4_xi[t_aI4_j] + m_aI8_r2 * t_rI4_pbestxi[t_aI4_j] + m_aI8_r3 * (t_rI4_xc[t_aI4_j]-t_rI4_xd[t_aI4_j]);
 			t_rI4_lxi[t_aI4_j] = new Double(Math.round(t_aI8_temp_x)).intValue();
 			t_rI4_lvi[t_aI4_j] = t_rI4_vi[t_aI4_j];
-			if(t_rI4_lxi[t_aI4_j] > m_aI4_xmax){
-				t_rI4_lxi[t_aI4_j] = m_aI4_xmax;
-			}else if(t_rI4_lxi[t_aI4_j] < m_aI4_xmin){
-				t_rI4_lxi[t_aI4_j] = m_aI4_xmin;
+		
+			if(t_aI4_j%2==0){
+				if(t_rI4_lxi[t_aI4_j] > m_aI4_xmax){
+					t_rI4_lxi[t_aI4_j] = m_aI4_xmax;
+				}else if(t_rI4_lxi[t_aI4_j] < m_aI4_xmin){
+					t_rI4_lxi[t_aI4_j] = m_aI4_xmin;
+				}
+			}else {
+				if(t_rI4_lxi[t_aI4_j] > m_aI4_ymax){
+					t_rI4_lxi[t_aI4_j] = m_aI4_ymax;
+				}else if(t_rI4_lxi[t_aI4_j] < m_aI4_ymin){
+					t_rI4_lxi[t_aI4_j] = m_aI4_ymin;
+				}
 			}
 		}
 		t_aTC_Li.setM_rI4_x(t_rI4_lxi);
@@ -320,10 +342,18 @@ public class DE_DNSPSOStrategy extends AStrategy{
 			double t_aI8_temp_x = m_aI8_r4 * t_rI4_xi[t_aI4_j] + m_aI8_r5 * t_rI4_gbestxi[t_aI4_j] + m_aI8_r6 * (t_rI4_xe[t_aI4_j]-t_rI4_xf[t_aI4_j]);
 			t_rI4_gxi[t_aI4_j] = new Double(Math.round(t_aI8_temp_x)).intValue();
 			t_rI4_gvi[t_aI4_j] = t_rI4_vi[t_aI4_j];
-			if(t_rI4_gxi[t_aI4_j] > m_aI4_xmax){
-				t_rI4_gxi[t_aI4_j] = m_aI4_xmax;
-			}else if(t_rI4_gxi[t_aI4_j] < m_aI4_xmin){
-				t_rI4_gxi[t_aI4_j] = m_aI4_xmin;
+			if(t_aI4_j%2==0){
+				if(t_rI4_gxi[t_aI4_j] > m_aI4_xmax){
+					t_rI4_gxi[t_aI4_j] = m_aI4_xmax;
+				}else if(t_rI4_gxi[t_aI4_j] < m_aI4_xmin){
+					t_rI4_gxi[t_aI4_j] = m_aI4_xmin;
+				}
+			}else {
+				if(t_rI4_gxi[t_aI4_j] > m_aI4_ymax){
+					t_rI4_gxi[t_aI4_j] = m_aI4_ymax;
+				}else if(t_rI4_gxi[t_aI4_j] < m_aI4_ymin){
+					t_rI4_gxi[t_aI4_j] = m_aI4_ymin;
+				}
 			}
 		}
 		
@@ -368,7 +398,7 @@ public class DE_DNSPSOStrategy extends AStrategy{
 				
 		//打印函数，用于测试调试
 		{
-		/*	System.out.println("==========初始化种群==========");
+			/*System.out.println("==========初始化种群==========");
 			printPopulation(m_aTC_population);
 			System.out.println("==========历史最优种群==========");
 			printPopulation(m_aTC_pBest);

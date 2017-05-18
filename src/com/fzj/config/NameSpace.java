@@ -30,10 +30,7 @@ public class NameSpace {
 	 */
 	public static final String s_str_wi = "w_i.txt";
 	
-	/**
-	 * 设备k是自动设备还是手动设备
-	 */
-	public static final String s_str_yk = "y_k.txt";
+	public static final String s_str_t0j = "t0_j.txt";
 	
 	/**
 	 * 包裹j的长度
@@ -43,32 +40,25 @@ public class NameSpace {
 	/**
 	 * 包裹j的体积
 	 */
-	public static final String s_str_sj = "s_j.txt";
+	public static final String s_str_vj = "v_j.txt";
 	
 	/**
-	 * 自动检测速度
+	 * 检测速度
 	 */
-	public static final String s_str_vak = "va_k.txt";
+	public static final String s_str_sk = "s_k.txt";
 	
-	/**
-	 * 手动检测速度
-	 */
-	public static final String s_str_vhk = "vh_k.txt";
 	
-	/**
-	 * 设备k的容积
-	 */
-	public static final String s_str_ck = "c_k.txt";
-	
-	/**
-	 * 携带i的概率
-	 */
-	public static final String s_str_bi = "b_i.txt";
+	public static final String s_str_aij = "a_ij.txt";
 	
 	/**
 	 * i被k检测的概率
 	 */
-	public static final String s_str_yik = "y_ik.txt";
+	public static final String s_str_bik = "b_ik.txt";
+	
+	/**
+	 * i被q检测的概率
+	 */
+	public static final String s_str_yiq = "y_iq.txt";
 	
 	/**
 	 * 第一组实验数据
@@ -110,7 +100,9 @@ public class NameSpace {
 	 */
 	public static final String s_str_k = "SECURITY_SCREENING_DEVICE";
 	
-	public static final String s_str_p = "PTHDEVICE";
+	public static final String s_str_q = "INSPECTOR";
+	
+	public static final String s_str_max_t = "MAX_T";
 	
 	/**
 	 * PSO算法
@@ -176,6 +168,8 @@ public class NameSpace {
 	 * DE_DNSPSO的最大迭代次数
 	 */
 	public static final String s_str_max_iter_de_dnspso = "max_iter_de_dnspso";
+	
+	public static final String s_str_max_iter = "max_iter";
 	
 	/**
 	 * FADE的最大迭代次数

@@ -13,12 +13,8 @@ public abstract class ASolution {
 	protected int[] m_rI4_x;// 位移向量，表示分配策略
 	protected int m_cur_iter;// 当前进化代数
 	protected int m_cur_nfe;// 当前适应度评价次数
+	protected double m_aI8_maxtime;//最大耗时
 	
-	//约束判定
-	protected double m_aI8_ta;// 当前分配方案的自动检测时间
-	protected double m_aI8_th;// 当前分配方案的手动检测时间
-	protected double m_rI8_vol[];//各个设备的当前容纳量
-	protected int[] m_rI4_bag;//每个包裹分配到的设备数
 
 	public ASolution() {
 	}
@@ -66,40 +62,15 @@ public abstract class ASolution {
 	public void setM_cur_nfe(int m_cur_nfe) {
 		this.m_cur_nfe = m_cur_nfe;
 	}
-
-	public double getM_aI8_ta() {
-		return m_aI8_ta;
+	
+	public double getM_aI8_maxtime() {
+		return m_aI8_maxtime;
 	}
-
-	public void setM_aI8_ta(double m_aI8_ta) {
-		this.m_aI8_ta = m_aI8_ta;
+	
+	public void setM_aI8_maxtime(double m_aI8_maxtime) {
+		this.m_aI8_maxtime = m_aI8_maxtime;
 	}
-
-	public double getM_aI8_th() {
-		return m_aI8_th;
-	}
-
-	public void setM_aI8_th(double m_aI8_th) {
-		this.m_aI8_th = m_aI8_th;
-	}
-
-
-	public double[] getM_rI8_vol() {
-		return m_rI8_vol;
-	}
-
-	public void setM_rI8_vol(double[] m_rI8_vol) {
-		this.m_rI8_vol = m_rI8_vol;
-	}
-
-	public int[] getM_rI4_bag() {
-		return m_rI4_bag;
-	}
-
-	public void setM_rI4_bag(int[] m_rI4_bag) {
-		this.m_rI4_bag = m_rI4_bag;
-	}
-
+	
 	
 	
 }

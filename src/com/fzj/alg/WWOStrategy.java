@@ -30,6 +30,10 @@ public class WWOStrategy extends AStrategy {
 	public WaveSolution m_aTC_best;// 当前最好和最差的解
 	private WaveSolution m_aTC_worst;
 	private double m_rI8_range[];// 第d维搜索空间的长度，此处一致
+	private int m_aI4_xmax;//位移上限
+	private int m_aI4_xmin;
+	private int m_aI4_ymax;//位移上限
+	private int m_aI4_ymin;
 
 	public WWOStrategy() {
 		super();
@@ -51,12 +55,17 @@ public class WWOStrategy extends AStrategy {
 		this.m_aI8_bmin = 0.001;
 		this.m_aI8_b = m_aI8_bmax;
 
+		this.m_aI4_xmax = m_aI4_k;
+		this.m_aI4_xmin = 1;
+		this.m_aI4_ymax = m_aI4_q;
+		this.m_aI4_ymin = 0;
+		
 		m_aTC_population = new WaveSolution[m_aI4_size];
 		m_aI4_Kmax = Math.min(12, m_aI4_d / 2);
 
 		m_rI8_range = new double[m_aI4_d];
 		for (int t_aI4_i = 0; t_aI4_i < m_aI4_d; t_aI4_i++) {
-			m_rI8_range[t_aI4_i] = 1;
+			m_rI8_range[t_aI4_i] = t_aI4_i%2==0?(m_aI4_k-1):(m_aI4_q);
 		}
 
 		m_aTC_best = new WaveSolution(m_aI4_d);
@@ -129,10 +138,20 @@ public class WWOStrategy extends AStrategy {
 			double t_aI8_r = MathUtils.getDoubleAToB(-1, 1);
 			int t_aI8_y = (int) Math.round(t_aI4_xd+t_aI8_r*t_aI8_w*m_rI8_range[t_aI4_j]);
 			//System.out.println("t_aI8_y = "+t_aI8_y);
-			if(t_aI8_y<m_aI4_low)
-				t_aI8_y = m_aI4_low;
-			else if(t_aI8_y>m_aI4_upper)
-				t_aI8_y = m_aI4_upper;
+		
+			if(t_aI4_j%2==0){
+				if(t_aI8_y > m_aI4_xmax){
+					t_aI8_y = m_aI4_xmax;
+				}else if(t_aI8_y < m_aI4_xmin){
+					t_aI8_y = m_aI4_xmin;
+				}
+			}else {
+				if(t_aI8_y > m_aI4_ymax){
+					t_aI8_y = m_aI4_ymax;
+				}else if(t_aI8_y < m_aI4_ymin){
+					t_aI8_y = m_aI4_ymin;
+				}
+			}
 			t_rI4_x[t_aI4_j] = t_aI8_y;
 		}
 		f_aTC_wave.setM_rI4_x(t_rI4_x);
@@ -161,10 +180,19 @@ public class WWOStrategy extends AStrategy {
 			double t_aI8_r = Math.sqrt(t_aI8_g)*m_aTC_random.nextGaussian()+t_aI8_u;
 			int t_aI4_temp = new Double(Math.round(t_aI8_r)).intValue();
 			//System.out.println("t_aI4_temp = "+t_aI4_temp);
-			if(t_aI4_temp<m_aI4_low)
-				t_aI4_temp = m_aI4_low;
-			else if(t_aI4_temp>m_aI4_upper)
-				t_aI4_temp = m_aI4_upper;
+			if(t_aI4_j%2==0){
+				if(t_aI4_temp > m_aI4_xmax){
+					t_aI4_temp = m_aI4_xmax;
+				}else if(t_aI4_temp < m_aI4_xmin){
+					t_aI4_temp = m_aI4_xmin;
+				}
+			}else {
+				if(t_aI4_temp > m_aI4_ymax){
+					t_aI4_temp = m_aI4_ymax;
+				}else if(t_aI4_temp < m_aI4_ymin){
+					t_aI4_temp = m_aI4_ymin;
+				}
+			}
 			t_rI4_x2[t_aI4_j] = t_aI4_temp;
 		}
 		t_aTC_wave2.setM_rI4_x(t_rI4_x2);
@@ -201,11 +229,21 @@ public class WWOStrategy extends AStrategy {
 			int[] t_rI4_x = t_aTC_newWave.getM_rI4_x();
 			double t_aI8_y = t_rI4_x[t_aI4_d]+m_aTC_random.nextGaussian()*m_aI8_b*m_rI8_range[t_aI4_d];
 			int t_aI4_temp = new Double(Math.round(t_aI8_y)).intValue();
-			System.out.println("breaking = "+t_aI4_temp);
-			if(t_aI4_temp<m_aI4_low)
-				t_aI4_temp = m_aI4_low;
-			else if(t_aI4_temp > m_aI4_upper)
-				t_aI4_temp = m_aI4_upper;
+			//System.out.println("breaking = "+t_aI4_temp);
+	
+			if(t_aI4_d%2==0){
+				if(t_aI4_temp > m_aI4_xmax){
+					t_aI4_temp = m_aI4_xmax;
+				}else if(t_aI4_temp < m_aI4_xmin){
+					t_aI4_temp = m_aI4_xmin;
+				}
+			}else {
+				if(t_aI4_temp > m_aI4_ymax){
+					t_aI4_temp = m_aI4_ymax;
+				}else if(t_aI4_temp < m_aI4_ymin){
+					t_aI4_temp = m_aI4_ymin;
+				}
+			}
 			t_rI4_x[t_aI4_d] = t_aI4_temp;
 			t_aTC_newWave.setM_rI4_x(t_rI4_x);
 			modify(t_aTC_newWave);
@@ -295,7 +333,7 @@ public class WWOStrategy extends AStrategy {
 		// 打印函数，用于测试调试
 		{
 
-		/*	System.out.println("==========初始化种群==========");
+			/*System.out.println("==========初始化种群==========");
 		    printPopulation(m_aTC_population);
 			System.out.println("==========种群中最优==========");
 			printSolution(m_aTC_best);

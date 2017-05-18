@@ -57,7 +57,7 @@ public class FileUtils {
 	 * @return
 	 */
 	public static String getResultName(String f_str_alg_name,String f_str_file_type,int f_aI4_max_nfe){
-		SimpleDateFormat t_aTC_sdf = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat t_aTC_sdf = new SimpleDateFormat("yyyyMM");
 		String t_str_file_name = f_str_alg_name.toLowerCase()+"_"+t_aTC_sdf.format(new Date())
 				+"_nfe="+f_aI4_max_nfe+f_str_file_type;
 		return t_str_file_name;
@@ -92,16 +92,17 @@ public class FileUtils {
 	 * @param f_str_filename ÎÄ¼þÃû
 	 * @return
 	 */
-	public static Map<String, Integer> readBasicInfo(String f_str_path,String f_str_filename){
-		Map<String, Integer> t_aTC_map = new HashMap<>();
+	public static Map<String, String> readBasicInfo(String f_str_path,String f_str_filename){
+		Map<String, String> t_aTC_map = new HashMap<>();
 		BufferedReader t_aTC_br = null;
 		try {
 		    t_aTC_br = new BufferedReader(new InputStreamReader(new FileInputStream(getCurrentPath()+f_str_path+f_str_filename)));
 			String t_str_s = t_aTC_br.readLine();
 			String[] t_rstr_s = t_str_s.split(",");
-			t_aTC_map.put(NameSpace.s_str_m, Integer.parseInt(t_rstr_s[0]));
-			t_aTC_map.put(NameSpace.s_str_n, Integer.parseInt(t_rstr_s[1]));
-			t_aTC_map.put(NameSpace.s_str_k, Integer.parseInt(t_rstr_s[2]));
+			t_aTC_map.put(NameSpace.s_str_m, t_rstr_s[0]);
+			t_aTC_map.put(NameSpace.s_str_n, (t_rstr_s[1]));
+			t_aTC_map.put(NameSpace.s_str_k, (t_rstr_s[2]));
+			t_aTC_map.put(NameSpace.s_str_q, (t_rstr_s[3]));
 			
 		} catch (IOException e) {
 			e.printStackTrace();

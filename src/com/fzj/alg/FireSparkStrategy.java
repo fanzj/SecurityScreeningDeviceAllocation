@@ -30,6 +30,10 @@ public class FireSparkStrategy extends AStrategy {
 	private FireSparkSolution m_aTC_worstFireSpark;// 种群中最差解
 	private FireSparkSolution m_aTC_best;// R中最优解
 
+	private int m_aI4_xmax;//位移上限
+	private int m_aI4_xmin;
+	private int m_aI4_ymax;//位移上限
+	private int m_aI4_ymin;
 	private List<ASolution> m_aTC_R;// 存放烟花及其生成的火星
 	private List<ASolution> m_aTC_P;
 	private int[] m_rI4_Si;// 烟花i生成的火星数
@@ -54,9 +58,15 @@ public class FireSparkStrategy extends AStrategy {
 		this.m_aI4_Smax = 20;
 		this.m_aI4_mm = 25;
 		this.m_aI4_mx = 5;
-		this.m_aI8_Ax = (m_aI4_upper - 1) / 7.0;
+		this.m_aI8_Ax = Math.min(m_aI4_q, m_aI4_k-1) / 7.0;
 		this.m_aI8_f = 0.5;
 		this.m_aI8_Cr = 0.9;
+		
+		
+		this.m_aI4_xmax = m_aI4_k;
+		this.m_aI4_xmin = 1;
+		this.m_aI4_ymax = m_aI4_q;
+		this.m_aI4_ymin = 0;
 
 		m_aTC_population = new FireSparkSolution[m_aI4_size];
 		m_aTC_R = new ArrayList<>();
@@ -111,10 +121,18 @@ public class FireSparkStrategy extends AStrategy {
 						int t_aI4_dd = m_aTC_random.nextInt(m_aI4_d);// 随机生成一维
 						t_rI4_xj[t_aI4_dd] = (int) (t_rI4_xi[t_aI4_dd]
 								+ Math.round(m_rI8_Ai[t_aI4_i] * MathUtils.getDoubleAToB(-1, 1)));
-						if (t_rI4_xj[t_aI4_dd] > m_aI4_upper)
-							t_rI4_xj[t_aI4_dd] = m_aI4_upper;
-						if (t_rI4_xj[t_aI4_dd] < m_aI4_low)
-							t_rI4_xj[t_aI4_dd] = m_aI4_low;
+						if(t_aI4_dd%2==0){
+							if (t_rI4_xj[t_aI4_dd] > m_aI4_xmax)
+								t_rI4_xj[t_aI4_dd] = m_aI4_xmax;
+							if (t_rI4_xj[t_aI4_dd] < m_aI4_xmin)
+								t_rI4_xj[t_aI4_dd] = m_aI4_xmin;
+						}else {
+							if (t_rI4_xj[t_aI4_dd] > m_aI4_ymax)
+								t_rI4_xj[t_aI4_dd] = m_aI4_ymax;
+							if (t_rI4_xj[t_aI4_dd] < m_aI4_ymin)
+								t_rI4_xj[t_aI4_dd] = m_aI4_ymin;
+						}
+						
 					}
 					t_aTC_spark.setM_rI4_x(t_rI4_xj);
 					modify(t_aTC_spark);
@@ -149,10 +167,17 @@ public class FireSparkStrategy extends AStrategy {
 				for (int t_aI4_k = 0; t_aI4_k < t_aI4_z; t_aI4_k++) {// 每个方向相当于问题维度的某几维
 					int t_aI4_dd = m_aTC_random.nextInt(m_aI4_d);// 随机生成一维
 					t_rI4_xj[t_aI4_dd] = (int) Math.round((1 + m_aTC_random.nextGaussian() * t_rI4_xi[t_aI4_dd]));
-					if (t_rI4_xj[t_aI4_dd] > m_aI4_upper)
-						t_rI4_xj[t_aI4_dd] = m_aI4_upper;
-					if (t_rI4_xj[t_aI4_dd] < m_aI4_low)
-						t_rI4_xj[t_aI4_dd] = m_aI4_low;
+					if(t_aI4_dd%2==0){
+						if (t_rI4_xj[t_aI4_dd] > m_aI4_xmax)
+							t_rI4_xj[t_aI4_dd] = m_aI4_xmax;
+						if (t_rI4_xj[t_aI4_dd] < m_aI4_xmin)
+							t_rI4_xj[t_aI4_dd] = m_aI4_xmin;
+					}else {
+						if (t_rI4_xj[t_aI4_dd] > m_aI4_ymax)
+							t_rI4_xj[t_aI4_dd] = m_aI4_ymax;
+						if (t_rI4_xj[t_aI4_dd] < m_aI4_ymin)
+							t_rI4_xj[t_aI4_dd] = m_aI4_ymin;
+					}
 				}
 				t_aTC_s2.setM_rI4_x(t_rI4_xj);
 				modify(t_aTC_s2);
@@ -226,10 +251,18 @@ public class FireSparkStrategy extends AStrategy {
 				for (int t_aI4_j = 0; t_aI4_j < m_aI4_d; t_aI4_j++) {
 					t_rI4_vig2[t_aI4_j] = (int) (t_rI4_xr1[t_aI4_j]
 							+ Math.round(m_aI8_f * (t_rI4_xr2[t_aI4_j] - t_rI4_xr3[t_aI4_j])));
-					if (t_rI4_vig2[t_aI4_j] > m_aI4_upper)
-						t_rI4_vig2[t_aI4_j] = m_aI4_upper;
-					if (t_rI4_vig2[t_aI4_j] < m_aI4_low)
-						t_rI4_vig2[t_aI4_j] = m_aI4_low;
+					
+					if(t_aI4_j%2==0){
+						if (t_rI4_vig2[t_aI4_j] > m_aI4_xmax)
+							t_rI4_vig2[t_aI4_j] = m_aI4_xmax;
+						if (t_rI4_vig2[t_aI4_j] < m_aI4_xmin)
+							t_rI4_vig2[t_aI4_j] = m_aI4_xmin;
+					}else {
+						if (t_rI4_vig2[t_aI4_j] > m_aI4_ymax)
+							t_rI4_vig2[t_aI4_j] = m_aI4_ymax;
+						if (t_rI4_vig2[t_aI4_j] < m_aI4_ymin)
+							t_rI4_vig2[t_aI4_j] = m_aI4_ymin;
+					}
 				}
 
 				// 交叉
