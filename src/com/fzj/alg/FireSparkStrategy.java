@@ -48,8 +48,8 @@ public class FireSparkStrategy extends AStrategy {
 	}
 
 	public FireSparkStrategy(int f_aI4_size, int f_aI4_max_nfe, int f_aI4_max_iter, SSModel f_aTC_ssm,
-			String f_str_data_path) {
-		super(f_aI4_size, f_aI4_max_nfe, f_aI4_max_iter, f_aTC_ssm, f_str_data_path);
+			String f_str_data_path, long f_aI8_max_time) {
+		super(f_aI4_size, f_aI4_max_nfe, f_aI4_max_iter, f_aTC_ssm, f_str_data_path, f_aI8_max_time);
 	}
 
 	@Override
@@ -83,13 +83,14 @@ public class FireSparkStrategy extends AStrategy {
 		m_rI1_isSelected = new boolean[m_aI4_size];
 
 		m_str_alg_name = NameSpace.s_str_fade;
-		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt, m_aI4_max_nfe);
+		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt, m_aI8_max_time);
 
 	}
 
 	@Override
 	protected void evolution() {
-		while (m_aI4_cur_nfe < m_aI4_max_nfe) {
+		long t_aI8_start = System.currentTimeMillis();
+		do {
 			m_aTC_R.clear();// 存放火星
 			double t_aI8_sumS = 0.0, t_aI8_sumA = 0.0;
 			for (int t_aI4_i = 0; t_aI4_i < m_aI4_size; t_aI4_i++) {// 遍历种群中的每个烟火
@@ -302,7 +303,9 @@ public class FireSparkStrategy extends AStrategy {
 			}
 
 			m_aI4_cur_iter++;
-		}
+		} while ((System.currentTimeMillis() - t_aI8_start) < m_aI8_max_time);
+		
+		System.out.println(m_str_alg_name+" m_aI8_time = "+(System.currentTimeMillis() - t_aI8_start));
 		System.out.println(m_str_alg_name+" m_aI4_cur_nfe = "+m_aI4_cur_nfe);
 		System.out.println(m_str_alg_name+" m_aI4_cur_iter = "+m_aI4_cur_iter);
 	}
@@ -389,7 +392,7 @@ public class FireSparkStrategy extends AStrategy {
 	public static void main(String[] args) {
 
 		SSModel t_aTC_ssm = new SSModel(NameSpace.s_str_data_01);
-		AStrategy t_aTC_strategy = new FireSparkStrategy(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_01);
+		AStrategy t_aTC_strategy = new FireSparkStrategy(10, 1000, 500, t_aTC_ssm, NameSpace.s_str_data_01,1000);
 		t_aTC_strategy.solve(0);
 
 	}

@@ -10,12 +10,14 @@ public class NameSpace {
 	/**
 	 * 读取路径
 	 */
-	public static final String s_str_experiment_data_path = "experiment_data\\";
+	//public static final String s_str_experiment_data_path = "experiment_data\\";
+	public static final String s_str_experiment_data_path = "experiment_data2\\";
 	
 	/**
 	 * 写入路径
 	 */
-	public static final String s_str_experiment_result_path = "experiment_result\\";
+	//public static final String s_str_experiment_result_path = "experiment_result\\";
+	public static final String s_str_experiment_result_path = "experiment_result2\\";
 
 	/**
 	 * 基本信息文件名 
@@ -84,6 +86,12 @@ public class NameSpace {
 	 * 第五组实验数据
 	 */
 	public static final String s_str_data_05 = "data_05\\";
+	
+	public static final String s_str_data_06 = "data_06\\";
+	
+	public static final String s_str_data_07 = "data_07\\";
+	
+	public static final String s_str_data_08 = "data_08\\";
 	
 	/**
 	 * 危险物品种类数
@@ -158,6 +166,11 @@ public class NameSpace {
 	 * 最大评价次数
 	 */
 	public static final String s_str_max_nfe = "max_nfe";
+	
+	/**
+	 * 单次最大运行时间
+	 */
+	public static final String s_str_max_time = "max_time";
 	
 	/**
 	 * DNSPSO的最大迭代次数

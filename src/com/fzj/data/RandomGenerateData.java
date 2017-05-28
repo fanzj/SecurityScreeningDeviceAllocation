@@ -237,11 +237,15 @@ public class RandomGenerateData {
 	}
 	
 	public static void main(String[] args) {
-		//RandomGenerateData t_aTC_genData = new RandomGenerateData(5, 24, 6,4);//T=250
-		//RandomGenerateData t_aTC_genData = new RandomGenerateData(12, 210, 18,12);//T=450
-		//RandomGenerateData t_aTC_genData = new RandomGenerateData(23, 450, 42,30);//T=580
-		RandomGenerateData t_aTC_genData = new RandomGenerateData(32, 1024, 64,40);//T=650
-		t_aTC_genData.genExpData("data_04");
+		//RandomGenerateData t_aTC_genData = new RandomGenerateData(5, 24, 3,4);//T=120
+		//RandomGenerateData t_aTC_genData = new RandomGenerateData(6, 50, 6,8);//T=150
+		//RandomGenerateData t_aTC_genData = new RandomGenerateData(9, 130, 13,9);//T=200
+		//RandomGenerateData t_aTC_genData = new RandomGenerateData(12, 245, 18,15);//T=300
+//		RandomGenerateData t_aTC_genData = new RandomGenerateData(23, 450, 42,30);//T=400
+//		RandomGenerateData t_aTC_genData = new RandomGenerateData(33, 752, 51,35);//T=400
+		//RandomGenerateData t_aTC_genData = new RandomGenerateData(45, 1024, 64,40);//T=420
+		RandomGenerateData t_aTC_genData = new RandomGenerateData(57, 1501, 120,80);//T=450
+		t_aTC_genData.genExpData("data_08");
 		System.out.println("数据生成成功！");
 	}
 }

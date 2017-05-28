@@ -37,11 +37,7 @@ public class JUnitTest {
 
 	@Test
 	public void testDNSPSO() {
-		AStrategy t_aTC_strategy = new DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, Integer.valueOf(m_aTC_p.getProperty(NameSpace.s_str_max_iter_dnspso)), m_aTC_ssm, m_str_data_path);	
-	    t_aTC_strategy.solve(0);
-	    
-//	    Thread t_aTC_dnspso_thread = new AlgThread(NameSpace.s_str_dnspso,m_aI4_size, m_aI4_max_nfe, Integer.valueOf(m_aTC_p.getProperty(NameSpace.s_str_max_iter_dnspso)), m_aI4_run_times,m_str_data_path);
-//		t_aTC_dnspso_thread.start();
+	
 	}
 	
 	@Test

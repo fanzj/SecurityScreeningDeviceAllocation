@@ -25,16 +25,18 @@ public class AlgRun {
 	private int m_aI4_max_nfe;//评价次数
 	private int m_aI4_max_iter;//迭代次数
 	private String m_str_result_name;//结果名称
+	protected long m_aI8_max_time;//最大运行时间
 	
 	public AlgRun(){}
 	
-	public AlgRun(String f_str_alg_type,String f_str_data_path,int f_aI4_size,int f_aI4_max_nfe,int f_aI4_max_iter){
+	public AlgRun(String f_str_alg_type,String f_str_data_path,int f_aI4_size,int f_aI4_max_nfe,int f_aI4_max_iter,long f_aI8_max_time){
 		this.m_str_alg_type = f_str_alg_type;
 		this.m_str_data_path = f_str_data_path;
 		this.m_aI4_size = f_aI4_size;
 		this.m_aI4_max_nfe = f_aI4_max_nfe;
 		this.m_aI4_max_iter = f_aI4_max_iter;
 		this.m_str_result_name = FileUtils.getResultName(m_str_alg_type, NameSpace.s_str_file_excel,f_aI4_max_nfe);
+		this.m_aI8_max_time = f_aI8_max_time;
 	}
 	
 	/**
@@ -59,13 +61,13 @@ public class AlgRun {
 		List<Fitness> t_aTC_minBest = new ArrayList<>();
 		for(int t_aI4_i=0;t_aI4_i<f_aI4_run_times;t_aI4_i++){
 			if (m_str_alg_type.equals(NameSpace.s_str_dnspso)) {
-				t_aTC_strategy = new DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+				t_aTC_strategy = new DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path, m_aI8_max_time);
 			}else if(m_str_alg_type.equals(NameSpace.s_str_fade)){
-				t_aTC_strategy = new FireSparkStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+				t_aTC_strategy = new FireSparkStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path, m_aI8_max_time);
 			}else if(m_str_alg_type.equals(NameSpace.s_str_wwo)){
-				t_aTC_strategy = new WWOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+				t_aTC_strategy = new WWOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path, m_aI8_max_time);
 			}else if(m_str_alg_type.equals(NameSpace.s_str_dednspso)){
-				t_aTC_strategy = new DE_DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path);
+				t_aTC_strategy = new DE_DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path, m_aI8_max_time);
 			}
 			t_aTC_best_solution = t_aTC_strategy.solve(t_aI4_i+1);
 			double t_aI4_best_fitness = t_aTC_best_solution.getM_aI8_fitness();
@@ -84,12 +86,12 @@ public class AlgRun {
 		
 		//将迭代过程保存到excel中
 		{
-			try {
+			/*try {
 				new ExcelUtil().writeExcel(t_aTC_minBest, FileUtils.getPath(m_str_data_path, m_str_alg_type)+m_str_result_name, m_str_alg_type);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 		}
 		
 		{

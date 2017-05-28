@@ -1,9 +1,11 @@
 package com.fzj.alg;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com.fzj.compare.TimeComparator;
 import com.fzj.config.NameSpace;
 import com.fzj.model.SSModel;
 import com.fzj.solution.ASolution;
@@ -56,16 +58,19 @@ public abstract class AStrategy {
 
 	protected List<Fitness> m_aTC_listOfFitness;// 用于结果的保存显示
 	protected ASolution[] m_aTC_population;// 种群
+	
+	protected long m_aI8_max_time;//单次最大运行时间
 
 	public AStrategy() {
 	}
 
-	public AStrategy(int f_aI4_size, int f_aI4_max_nfe, int f_aI4_max_iter, SSModel f_aTC_ssm, String f_str_data_path) {
+	public AStrategy(int f_aI4_size, int f_aI4_max_nfe, int f_aI4_max_iter, SSModel f_aTC_ssm, String f_str_data_path, long f_aI8_max_time) {
 		this.m_aI4_size = f_aI4_size;
 		this.m_aI4_max_nfe = f_aI4_max_nfe;
 		this.m_aI4_max_iter = f_aI4_max_iter;
 		this.m_aTC_ssm = f_aTC_ssm;
 		this.m_str_data_path = f_str_data_path;
+		this.m_aI8_max_time = f_aI8_max_time;
 
 		this.m_aI4_cur_iter = 0;
 		this.m_aI4_cur_nfe = 0;
@@ -151,7 +156,7 @@ public abstract class AStrategy {
 		double[] t_rI8_t1 = new double[m_aI4_n];
 		for(int t_aI4_j=0;t_aI4_j<m_aI4_n;t_aI4_j++){//对每个行李
 			int t_aI4_xj = t_rI4_x[t_aI4_j * 2];// 决策变量
-			t_rI8_t1[t_aI4_j] += m_rI8_t0j[t_aI4_j];
+			//t_rI8_t1[t_aI4_j] += m_rI8_t0j[t_aI4_j];
 			//构造Pre(j)集合
 			List<Integer> t_aTC_pre = getPre(t_aI4_j, t_rI4_x);
 			for(int t_aI4_i=0;t_aI4_i<t_aTC_pre.size();t_aI4_i++){
@@ -161,7 +166,57 @@ public abstract class AStrategy {
 		return t_rI8_t1;
 	}
 	
-	private List<Integer> getPre2(int f_aI4_j,int[] f_rI4_x,double[] f_rI8_t1){
+	private List<Integer> getBq(int f_aI4_yj,int[] f_rI4_x,double[] f_rI8_t1){
+		List<Integer> t_aTC_list = new ArrayList<>();//存放包裹编号
+		for(int t_aI4_i=0;t_aI4_i<m_aI4_d;t_aI4_i++){
+			if(t_aI4_i%2!=0){
+				int t_aI4_yj = f_rI4_x[t_aI4_i];// 决策变量
+				if(f_aI4_yj !=0 && f_aI4_yj==t_aI4_yj)
+					t_aTC_list.add((t_aI4_i-1)/2);
+			}
+		}
+		return t_aTC_list;
+	}
+	
+	private double calT2(ASolution f_aTC_s){
+		double[] t_rI8_t1j = calT1(f_aTC_s);
+		int[] t_rI4_x = f_aTC_s.getM_rI4_x();
+		double[] t_rI8_t2 = new double[m_aI4_n];
+		double t_aI8_t = 0;
+		for(int t_aI4_q=0;t_aI4_q<=m_aI4_q;t_aI4_q++){
+			//构造Bq集合
+			List<Integer> t_aTC_Bq = getBq(t_aI4_q, t_rI4_x,t_rI8_t1j);
+			//System.out.println("排序前："+t_aTC_Bq);
+			//Bq排序
+			Collections.sort(t_aTC_Bq, new TimeComparator(t_rI8_t1j));
+			/*System.out.println("排序后："+t_aTC_Bq);
+			for(int i=0;i<t_aTC_Bq.size();i++){
+				System.out.print(t_rI8_t1j[t_aTC_Bq.get(i)]);
+				if(i<t_aTC_Bq.size()-1)
+					System.out.print(" ");
+				else
+					System.out.println();
+			}*/
+			for(int t_aI4_i=0;t_aI4_i<t_aTC_Bq.size();t_aI4_i++){
+				int t_aI4_num = t_aTC_Bq.get(t_aI4_i);//行李编号
+				if(t_aI4_i==0){
+					t_rI8_t2[t_aI4_num] += (t_rI8_t1j[t_aI4_num] + m_rI8_tj[t_aI4_num]);
+				}else {
+					int t_aI4_pre_num = t_aTC_Bq.get(t_aI4_i-1);
+					t_rI8_t2[t_aI4_num] = (Math.max(t_rI8_t1j[t_aI4_num], t_rI8_t2[t_aI4_pre_num]) + m_rI8_tj[t_aI4_num]);
+				}
+			}
+		}
+		for(int t_aI4_j=0;t_aI4_j<m_aI4_n;t_aI4_j++){
+			t_aI8_t = Math.max(t_aI8_t, t_rI8_t2[t_aI4_j]);
+		}
+		f_aTC_s.setM_aI8_maxtime(t_aI8_t);
+		return t_aI8_t;
+	}
+	
+	
+	
+	/*private List<Integer> getPre2(int f_aI4_j,int[] f_rI4_x,double[] f_rI8_t1){
 		List<Integer> t_aTC_list = new ArrayList<>();//存放包裹编号
 		for(int t_aI4_i=0;t_aI4_i<m_aI4_d;t_aI4_i++){
 			if(t_aI4_i%2!=0){
@@ -171,9 +226,9 @@ public abstract class AStrategy {
 			}
 		}
 		return t_aTC_list;
-	}
+	}*/
 	
-	private double calT2(ASolution f_aTC_s){
+	/*private double calT2(ASolution f_aTC_s){
 		double[] t_rI8_t1j = calT1(f_aTC_s);
 		int[] t_rI4_x = f_aTC_s.getM_rI4_x();
 		double[] t_rI8_t2 = new double[m_aI4_n];
@@ -191,7 +246,7 @@ public abstract class AStrategy {
 		}
 		f_aTC_s.setM_aI8_maxtime(t_aI8_t);
 		return t_aI8_t;
-	}
+	}*/
 	
 
 	/**
