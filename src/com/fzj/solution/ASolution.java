@@ -15,6 +15,8 @@ public abstract class ASolution {
 	protected int m_cur_nfe;// 当前适应度评价次数
 	protected double m_aI8_maxtime;//最大耗时
 	
+	protected double m_aI8_pi;//累计进化概率
+	
 
 	public ASolution() {
 	}
@@ -71,6 +73,13 @@ public abstract class ASolution {
 		this.m_aI8_maxtime = m_aI8_maxtime;
 	}
 	
+	public void setM_aI8_pi(double m_aI8_pi) {
+		this.m_aI8_pi = m_aI8_pi;
+	}
+	
+	public double getM_aI8_pi() {
+		return m_aI8_pi;
+	}
 	
 	
 }

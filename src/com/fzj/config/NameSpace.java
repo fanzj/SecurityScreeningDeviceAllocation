@@ -17,7 +17,7 @@ public class NameSpace {
 	 * 写入路径
 	 */
 	//public static final String s_str_experiment_result_path = "experiment_result\\";
-	public static final String s_str_experiment_result_path = "experiment_result3\\";
+	public static final String s_str_experiment_result_path = "experiment_result4\\";
 
 	/**
 	 * 基本信息文件名 

@@ -239,7 +239,7 @@ public class RandomGenerateData {
 	public static void main(String[] args) {
 		//RandomGenerateData t_aTC_genData = new RandomGenerateData(5, 24, 3,4);//T=120
 		//RandomGenerateData t_aTC_genData = new RandomGenerateData(6, 50, 6,8);//T=150
-		//RandomGenerateData t_aTC_genData = new RandomGenerateData(9, 130, 13,9);//T=200
+		//RandomGenerateData t_aTC_genData = new RandomGenerateData(9, 130, 13,9);//T=200 -> 180
 		//RandomGenerateData t_aTC_genData = new RandomGenerateData(12, 245, 18,15);//T=300
 //		RandomGenerateData t_aTC_genData = new RandomGenerateData(23, 450, 42,30);//T=400
 //		RandomGenerateData t_aTC_genData = new RandomGenerateData(33, 752, 51,35);//T=400
