@@ -74,7 +74,7 @@ public class WWOStrategy extends AStrategy {
 		m_aTC_worst.setM_aI8_fitness(Double.MAX_VALUE);
 
 		m_str_alg_name = NameSpace.s_str_wwo;
-		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt, m_aI8_max_time);
+		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt, m_aI4_max_nfe);
 	}
 	
 	private void updateBestAndWorst(){
@@ -297,7 +297,7 @@ public class WWOStrategy extends AStrategy {
 	@Override
 	protected void evolution() {
 		long t_aI8_start = System.currentTimeMillis();
-		do {
+		while(m_aI4_cur_nfe<=m_aI4_max_nfe) {
 			evolve();
 			sortPopulation();
 			updateW();
@@ -305,9 +305,9 @@ public class WWOStrategy extends AStrategy {
 			updateB();
 			//updateN();
 			m_aI4_cur_iter++;
-		} while ((System.currentTimeMillis() - t_aI8_start) < m_aI8_max_time);
+		}
 		
-		System.out.println(m_str_alg_name+" m_aI8_time = "+(System.currentTimeMillis() - t_aI8_start));
+		System.out.println(m_str_alg_name+" m_aI8_time = "+(System.currentTimeMillis() - t_aI8_start)/1000.0);
 		System.out.println(m_str_alg_name+" m_aI4_cur_nfe = "+m_aI4_cur_nfe);
 		System.out.println(m_str_alg_name+" m_aI4_cur_iter = "+m_aI4_cur_iter);
 	}

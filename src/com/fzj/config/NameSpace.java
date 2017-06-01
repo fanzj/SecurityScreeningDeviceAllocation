@@ -17,7 +17,7 @@ public class NameSpace {
 	 * 写入路径
 	 */
 	//public static final String s_str_experiment_result_path = "experiment_result\\";
-	public static final String s_str_experiment_result_path = "experiment_result2\\";
+	public static final String s_str_experiment_result_path = "experiment_result3\\";
 
 	/**
 	 * 基本信息文件名 
@@ -133,9 +133,11 @@ public class NameSpace {
 	public static final String s_str_wwo = "WWO";
 	
 	/**
-	 * PWWO算法
+	 * DE算法
 	 */
-	public static final String s_str_pwwo = "PWWO";
+	public static final String s_str_de = "DE";
+	
+	public static final String s_str_ga = "GA";
 	
 	/**
 	 * 改进的DNSPSO
@@ -172,27 +174,11 @@ public class NameSpace {
 	 */
 	public static final String s_str_max_time = "max_time";
 	
-	/**
-	 * DNSPSO的最大迭代次数
-	 */
-	public static final String s_str_max_iter_dnspso = "max_iter_dnspso";
 	
-	/**
-	 * DE_DNSPSO的最大迭代次数
-	 */
-	public static final String s_str_max_iter_de_dnspso = "max_iter_de_dnspso";
 	
 	public static final String s_str_max_iter = "max_iter";
 	
-	/**
-	 * FADE的最大迭代次数
-	 */
-	public static final String s_str_max_iter_fade = "max_iter_fade";
 	
-	/**
-	 * WWO的最大迭代次数
-	 */
-	public static final String s_str_max_iter_wwo = "max_iter_wwo";
 	
 	/**
 	 * 正式运行配置

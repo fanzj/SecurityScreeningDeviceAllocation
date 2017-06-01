@@ -73,7 +73,7 @@ public class DE_DNSPSOStrategy extends AStrategy{
 		this.m_aI4_ymin = 0;
 		
 		m_str_alg_name = NameSpace.s_str_dednspso;
-		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt,m_aI8_max_time);
+		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt,m_aI4_max_nfe);
 	}
 	
 	/**
@@ -126,7 +126,7 @@ public class DE_DNSPSOStrategy extends AStrategy{
 	@Override
 	protected void evolution() {
 		long t_aI8_start = System.currentTimeMillis();
-		do {
+		while(m_aI4_cur_nfe<=m_aI4_max_nfe) {
 			//第三阶段
 			{
 				// 遍历种群中的每个解，应用DE的变异、交叉、选择操作
@@ -228,9 +228,9 @@ public class DE_DNSPSOStrategy extends AStrategy{
 			
 			updateW();
 			m_aI4_cur_iter++;
-		} while ((System.currentTimeMillis() - t_aI8_start)<m_aI8_max_time);
+		} 
 		
-		System.out.println(m_str_alg_name+" m_aI8_time = "+(System.currentTimeMillis() - t_aI8_start));
+		System.out.println(m_str_alg_name+" m_aI8_time = "+(System.currentTimeMillis() - t_aI8_start)/1000.0);
 		System.out.println(m_str_alg_name+" m_aI4_cur_nfe = "+m_aI4_cur_nfe);
 		System.out.println(m_str_alg_name+" m_aI4_cur_iter = "+m_aI4_cur_iter);
 	}

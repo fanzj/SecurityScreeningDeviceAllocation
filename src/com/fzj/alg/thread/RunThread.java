@@ -21,7 +21,7 @@ public class RunThread {
 		int t_aI4_run_times = Integer.valueOf(t_aTC_p.getProperty(NameSpace.s_str_run_times));
 		int t_aI4_max_nfe = Integer.valueOf(t_aTC_p.getProperty(NameSpace.s_str_max_nfe));
 		long t_aI8_max_time = (long) (m_aI4_sec * Double.valueOf(t_aTC_p.getProperty(NameSpace.s_str_max_time)));//×ª»»³ÉºÁÃë
-		String t_str_data_path = NameSpace.s_str_data_08;
+		String t_str_data_path = NameSpace.s_str_data_01;
 		
 		Thread t_aTC_dnspso_thread = new AlgThread(NameSpace.s_str_dnspso,t_aI4_size, t_aI4_max_nfe, Integer.valueOf(t_aTC_p.getProperty(NameSpace.s_str_max_iter)), t_aI4_run_times,t_str_data_path,t_aI8_max_time);
 		t_aTC_dnspso_thread.start();
@@ -35,5 +35,10 @@ public class RunThread {
 		Thread t_aTC_wwo_thread = new AlgThread(NameSpace.s_str_wwo,t_aI4_size, t_aI4_max_nfe, Integer.valueOf(t_aTC_p.getProperty(NameSpace.s_str_max_iter)), t_aI4_run_times,t_str_data_path,t_aI8_max_time);
 		t_aTC_wwo_thread.start();
 		
+		Thread t_aTC_de_thread = new AlgThread(NameSpace.s_str_de,t_aI4_size, t_aI4_max_nfe, Integer.valueOf(t_aTC_p.getProperty(NameSpace.s_str_max_iter)), t_aI4_run_times,t_str_data_path,t_aI8_max_time);
+		t_aTC_de_thread.start();
+		
+//		Thread t_aTC_ga_thread = new AlgThread(NameSpace.s_str_ga,t_aI4_size, t_aI4_max_nfe, Integer.valueOf(t_aTC_p.getProperty(NameSpace.s_str_max_iter)), t_aI4_run_times,t_str_data_path,t_aI8_max_time);
+//		t_aTC_ga_thread.start();
 	}
 }

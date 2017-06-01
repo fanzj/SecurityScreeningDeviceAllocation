@@ -53,13 +53,13 @@ public class FileUtils {
 	 * 根据算法名和时间生成不同类型的文件
 	 * @param f_str_alg_name 算法名称
 	 * @param f_str_file_type 文件类型
-	 * @param f_aI4_max_nfe 最大运行时间
+	 * @param f_aI4_max_nfe 最大评价次数
 	 * @return
 	 */
-	public static String getResultName(String f_str_alg_name,String f_str_file_type,long f_aI8_max_time){
+	public static String getResultName(String f_str_alg_name,String f_str_file_type,int f_aI4_max_nfe){
 		SimpleDateFormat t_aTC_sdf = new SimpleDateFormat("yyyyMM");
 		String t_str_file_name = f_str_alg_name.toLowerCase()+"_"+t_aTC_sdf.format(new Date())
-				+"_time="+f_aI8_max_time+"ms"+f_str_file_type;
+				+"_nfe="+f_aI4_max_nfe+f_str_file_type;
 		return t_str_file_name;
 	}
 	

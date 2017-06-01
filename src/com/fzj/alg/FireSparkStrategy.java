@@ -83,14 +83,14 @@ public class FireSparkStrategy extends AStrategy {
 		m_rI1_isSelected = new boolean[m_aI4_size];
 
 		m_str_alg_name = NameSpace.s_str_fade;
-		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt, m_aI8_max_time);
+		m_str_file_name = FileUtils.getResultName(m_str_alg_name, NameSpace.s_str_file_txt, m_aI4_max_nfe);
 
 	}
 
 	@Override
 	protected void evolution() {
 		long t_aI8_start = System.currentTimeMillis();
-		do {
+		while(m_aI4_cur_nfe<=m_aI4_max_nfe) {
 			m_aTC_R.clear();// 存放火星
 			double t_aI8_sumS = 0.0, t_aI8_sumA = 0.0;
 			for (int t_aI4_i = 0; t_aI4_i < m_aI4_size; t_aI4_i++) {// 遍历种群中的每个烟火
@@ -303,9 +303,9 @@ public class FireSparkStrategy extends AStrategy {
 			}
 
 			m_aI4_cur_iter++;
-		} while ((System.currentTimeMillis() - t_aI8_start) < m_aI8_max_time);
+		}
 		
-		System.out.println(m_str_alg_name+" m_aI8_time = "+(System.currentTimeMillis() - t_aI8_start));
+		System.out.println(m_str_alg_name+" m_aI8_time = "+(System.currentTimeMillis() - t_aI8_start)/1000.0);
 		System.out.println(m_str_alg_name+" m_aI4_cur_nfe = "+m_aI4_cur_nfe);
 		System.out.println(m_str_alg_name+" m_aI4_cur_iter = "+m_aI4_cur_iter);
 	}
