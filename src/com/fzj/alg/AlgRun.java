@@ -8,6 +8,7 @@ import com.fzj.model.SSModel;
 import com.fzj.solution.ASolution;
 import com.fzj.solution.Fitness;
 import com.fzj.utils.FileUtils;
+import com.fzj.utils.MathUtils;
 import com.fzj.utils.TimeUtils;
 import com.fzj.utils.excel.ExcelUtil;
 
@@ -59,6 +60,7 @@ public class AlgRun {
 		double t_aI8_fmax = Double.MIN_VALUE;
 		List<ASolution> t_aTC_results = new ArrayList<>();
 		List<Fitness> t_aTC_minBest = new ArrayList<>();
+		long start = System.currentTimeMillis();
 		for(int t_aI4_i=0;t_aI4_i<f_aI4_run_times;t_aI4_i++){
 			if (m_str_alg_type.equals(NameSpace.s_str_dnspso)) {
 				t_aTC_strategy = new DNSPSOStrategy(m_aI4_size, m_aI4_max_nfe, m_aI4_max_iter, t_aTC_ssm, m_str_data_path, m_aI8_max_time);
@@ -87,6 +89,7 @@ public class AlgRun {
 			}
 			t_aTC_results.add(t_aTC_best_solution);
 		}
+		long end = System.currentTimeMillis();
 		
 		//将迭代过程保存到excel中
 		{
@@ -108,6 +111,7 @@ public class AlgRun {
 				t_aI8_std += (t_aTC_solution.getM_aI8_fitness()-t_aI8_mean) * (t_aTC_solution.getM_aI8_fitness()-t_aI8_mean);
 			}
 			t_str_result.append("standard std = "+Math.sqrt(t_aI8_std/(f_aI4_run_times-1))+"\n");
+			t_str_result.append("runtime = "+TimeUtils.getRunTime(start, end)+"\n");
 			t_str_result.append(t_aTC_strategy.getResultContent(-1, t_aTC_best));
 			
 			FileUtils.saveFile(m_str_data_path, m_str_alg_type, t_aTC_strategy.m_str_file_name, t_str_result.toString());

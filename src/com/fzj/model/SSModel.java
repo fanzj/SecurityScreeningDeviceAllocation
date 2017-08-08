@@ -1,8 +1,11 @@
 package com.fzj.model;
 
 import java.util.Map;
+import java.util.Properties;
+
 import com.fzj.config.NameSpace;
 import com.fzj.utils.FileUtils;
+import com.fzj.utils.MProperties;
 import com.fzj.utils.MathUtils;
 
 /**
@@ -82,6 +85,8 @@ public class SSModel {
 	 * i被q检测的概率
 	 */
 	private double m_rI8_yiq[][];
+	
+	Properties t_aTC_p = MProperties.get(NameSpace.s_str_run_config);
 
 	public SSModel(String f_str_path) {
 		FileUtils.s_aI1_operation = true;// 读取路径的选择
@@ -90,7 +95,7 @@ public class SSModel {
 		this.m_aI4_n = Integer.parseInt(t_aTC_map.get(NameSpace.s_str_n));
 		this.m_aI4_k = Integer.parseInt(t_aTC_map.get(NameSpace.s_str_k));
 		this.m_aI4_q = Integer.parseInt(t_aTC_map.get(NameSpace.s_str_q));
-		this.m_aI8_max_t = 420;
+		this.m_aI8_max_t = Integer.parseInt(t_aTC_p.getProperty(NameSpace.s_str_u_t));
 		this.m_aI4_d = m_aI4_n * 2;
 		this.m_rI8_wi = FileUtils.read1D(f_str_path, NameSpace.s_str_wi, m_aI4_m);
 		this.m_rI8_t0j = FileUtils.read1D(f_str_path, NameSpace.s_str_t0j, m_aI4_n);

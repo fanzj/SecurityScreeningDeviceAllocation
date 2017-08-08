@@ -17,7 +17,7 @@ public class NameSpace {
 	 * 写入路径
 	 */
 	//public static final String s_str_experiment_result_path = "experiment_result\\";
-	public static final String s_str_experiment_result_path = "experiment_result4\\";
+	public static final String s_str_experiment_result_path = "experiment_result\\";
 
 	/**
 	 * 基本信息文件名 
@@ -112,6 +112,8 @@ public class NameSpace {
 	
 	public static final String s_str_max_t = "MAX_T";
 	
+
+	
 	/**
 	 * PSO算法
 	 */
@@ -178,7 +180,7 @@ public class NameSpace {
 	
 	public static final String s_str_max_iter = "max_iter";
 	
-	
+	public static final String s_str_u_t = "upper_t";
 	
 	/**
 	 * 正式运行配置
