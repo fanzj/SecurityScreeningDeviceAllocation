@@ -62,6 +62,8 @@ public class NameSpace {
 	 */
 	public static final String s_str_yiq = "y_iq.txt";
 	
+	public static final String s_str_data = "data_";
+	
 	/**
 	 * 第一组实验数据
 	 */

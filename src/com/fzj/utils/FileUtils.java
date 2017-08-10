@@ -218,5 +218,16 @@ public class FileUtils {
 		return t_rI8_2d;
 	}
 	
+	public static void print(double[] d){
+		for(int i=0;i<d.length;i++){
+			System.out.print(d[i]);
+			if(i<d.length-1)
+				System.out.print(" ");
+			else {
+				System.out.println();
+			}
+		}
+	}
+	
 	
 }

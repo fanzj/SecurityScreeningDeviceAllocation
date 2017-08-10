@@ -45,8 +45,22 @@ public class TimeUtils {
 		return time;
 	}
 	
+	/**
+	 * Ê±¼ä×ª»»
+	 * @param h
+	 * @param m
+	 * @param s
+	 * @param ms
+	 * @return
+	 */
+	public static String transTime(int h,int m,int s,int ms, int run){
+		double time = 3600.0 * h + 60.0 * m + 1.0 * s + ms / 1000.0;
+		double avg = time / run;
+		return String.format("time = %.3f, avg = %.3f\n", time,avg);
+	}
+	
 	public static void main(String[] args) {
-		long start = System.currentTimeMillis();
+		/*long start = System.currentTimeMillis();
 		try {
 			Thread.sleep(30121);
 		} catch (InterruptedException e) {
@@ -54,6 +68,13 @@ public class TimeUtils {
 			e.printStackTrace();
 		}
 		long end  = System.currentTimeMillis();
-		System.out.println(getRunTime(start, end));
+		System.out.println(getRunTime(start, end));*/
+		
+		System.out.println(transTime(0, 13, 33, 847, 30));
+		System.out.println(transTime(0, 13, 42, 54, 30));
+		System.out.println(transTime(0, 13, 7, 648, 30));
+		System.out.println(transTime(0, 13, 19, 853, 30));
+		System.out.println(transTime(0, 13, 34, 440, 30));
+		System.out.println(transTime(0, 12, 49, 822, 30));
 	}
 }
